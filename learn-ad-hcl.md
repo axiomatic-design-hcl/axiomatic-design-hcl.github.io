@@ -1512,3 +1512,4 @@ These documents are the full reference:
 4. The [assessment contract](https://github.com/axiomatic-design-hcl/spec/blob/main/docs/assessment-contract.md) explains how the tool derives its results.
 5. The [starter example](https://github.com/axiomatic-design-hcl/spec/tree/main/examples/starter) shows a complete project with all three attachment roles.
 6. The [adhcl README](https://github.com/axiomatic-design-hcl/adhcl#readme) explains the command line, the inputs, and the exit codes.
+7. The [Axiomatic Design plugin](https://github.com/axiomatic-design-hcl/axiomatic-design-plugin) adds two skills to Claude Code. One skill applies the method to a system. The other skill writes the design as `.ad.hcl` files. The [plugin page](plugin.html) describes both skills.

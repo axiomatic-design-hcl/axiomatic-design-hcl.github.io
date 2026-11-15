@@ -242,3 +242,5 @@ table.data th { background: var(--paper-2); font-weight: 600; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+@media (max-width: 480px) { .site-nav { gap: var(--s3); font-size: var(--t12); } }
