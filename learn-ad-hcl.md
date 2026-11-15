@@ -91,11 +91,15 @@ An FR states an outcome.
 A DP controls an outcome.
 A PV realizes a DP.
 
+Suh names the four domains the customer domain, the functional domain, the physical domain, and the process domain.
+The table uses the names of their contents.
+
 ### The design matrix
 
 The design matrix shows which DP affects which FR.
 It has one row for each FR and one column for each DP.
-Each cell has one of three values:
+In the papers on Axiomatic Design, each cell is a number: the rate of change of the FR when the DP changes.
+Many effects in software are not numbers, so RequirementsHCL uses three symbols in place of numbers:
 
 | Value | Meaning |
 |---|---|
@@ -109,15 +113,19 @@ If you do not state a fact, the tool treats it as unknown.
 
 ### Three kinds of design
 
-The Independence Axiom says this: keep the FRs independent of each other.
-In a good design, you can adjust each FR with its own DP and not break the other FRs.
-The matrix tells you how well the design does this:
+The Independence Axiom says: "Maintain the independence of the functional requirements."
+When you change the DP of one FR, the other FRs must stay within their targets.
+The matrix tells you if the design does this:
 
 | Kind | Matrix shape | What it means for you |
 |---|---|---|
 | Uncoupled | Only the diagonal has `X`. | Each DP changes only its own FR. You can set the DPs in any order. |
-| Decoupled | The `X` cells form a triangle. | You can set the DPs in one fixed order and not go back. |
-| Coupled | No order makes a triangle. | A change to one DP forces changes to others, maybe again and again. |
+| Decoupled | In a suitable order of rows and columns, the `X` cells form a triangle. | The FRs stay independent only if you set the DPs in that order. |
+| Coupled | No order makes a diagonal or a triangle. | A change to one DP forces changes to others, maybe again and again. |
+
+Uncoupled and decoupled designs satisfy the Independence Axiom.
+Coupled designs do not.
+A design with fewer DPs than FRs is always coupled.
 
 Here are three small matrices, with FRs as rows and DPs as columns:
 
@@ -1219,13 +1227,20 @@ decision "note_search" {
 The tool reports `unresolved_feasibility` as a warning.
 No evidence shows that this candidate meets the criteria.
 
-The Information Axiom picks the design with the highest chance of success.
-Information content is `I = -log2(p)`, where `p` is the chance that all FRs succeed together.
+The Information Axiom says: "Minimize the information content of the design."
+It chooses among the designs that satisfy the Independence Axiom.
+Information content is `I = log2(1/p)`, which is the same as `-log2(p)`.
+Here `p` is the chance that an FR meets its target.
+A lower `I` means a higher chance of success.
+
+Suh adds the information contents of several FRs only when the FRs succeed or fail independently of each other.
+In 2000, Frey and his coauthors proved that this sum does not apply to decoupled designs.
+For this reason, RequirementsHCL uses one `p` for all FRs together.
 The language has strict rules for `p`:
 
 1. You cannot type a probability. It comes only from an `evidence` block with measured trials.
 2. The evidence names the candidate version, context, workload, time horizon, and a scenario that covers every criterion.
-3. Each trial measures all FRs together. You cannot multiply separate success rates.
+3. Each trial measures all FRs together. Do not multiply separate success rates only because the matrix is diagonal.
 4. Zero failures do not prove `p = 1`. The tool gives an interval, not a certainty.
 5. Without such evidence, the information content stays unknown and the decision stays provisional.
 
@@ -1513,3 +1528,13 @@ These documents are the full reference:
 5. The [starter example](https://github.com/axiomatic-design-hcl/spec/tree/main/examples/starter) shows a complete project with all three attachment roles.
 6. The [adhcl README](https://github.com/axiomatic-design-hcl/adhcl#readme) explains the command line, the inputs, and the exit codes.
 7. The [Axiomatic Design plugin](https://github.com/axiomatic-design-hcl/axiomatic-design-plugin) adds two skills to Claude Code. One skill applies the method to a system. The other skill writes the design as `.ad.hcl` files. The [plugin page](plugin.html) describes both skills.
+
+### Sources on Axiomatic Design
+
+The method in this guide comes from these sources:
+
+1. Kim, Suh, and Kim (1991), [Design of software systems based on axiomatic design](https://scispace.com/papers/design-of-software-systems-based-on-axiomatic-design-1cll9pq68v). It applies the method to software and defines the S, C, and F junctions.
+2. Suh (1995), [Designing-in of quality through axiomatic design](https://scispace.com/papers/designing-in-of-quality-through-axiomatic-design-1euher7e2j). It gives the domains, the zigzag, the two axioms, and the matrix classes.
+3. Suh (1998), [Axiomatic design theory for systems](https://scispace.com/papers/axiomatic-design-theory-for-systems-2ew81efl0d). It states both axioms and the rule for adding information contents.
+4. Frey, Jahangir, and Engelhardt (2000), [Computing the information content of decoupled designs](https://scispace.com/papers/computing-the-information-content-of-decoupled-designs-2wsk61o40c). It proves that the sum of information contents does not apply to decoupled designs.
+5. Suh (2001), [Axiomatic Design: Advances and Applications](https://scispace.com/papers/axiomatic-design-advances-and-applications-41lnfhtghu). This book covers the full method, with software examples.
