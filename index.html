@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RequirementsHCL and adhcl</title>
+<meta name="description" content="RequirementsHCL is a language for Axiomatic Design of software. The adhcl tool reads .ad.hcl files, derives the design matrices, and reports errors and gaps.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brand-mark">AD</span> RequirementsHCL</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="#what">The language</a>
+      <a href="#adhcl">The adhcl tool</a>
+      <a href="learn.html">Learn</a>
+      <a href="https://github.com/axiomatic-design-hcl">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Axiomatic Design for software</span>
+    <h1>Write the design once. Let the tool find the coupling.</h1>
+    <p class="lead">RequirementsHCL is a language for <code>.ad.hcl</code> files. You write what the software must do, how the design does it, and how the parts affect each other. The <code>adhcl</code> tool derives the design matrices and reports each error and gap.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="learn.html">Start the course</a>
+      <a class="btn" href="#adhcl">Install adhcl</a>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="what" aria-labelledby="what-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The language</span>
+      <h2 id="what-title">A typed model of your software</h2>
+      <p class="lead">An <code>.ad.hcl</code> file gives people and AI tools one model of the software. The model holds the needs, the requirements, the design choices, and the effects between them.</p>
+    </div>
+    <div class="grid grid-2">
+      <div>
+        <h3>You write the facts</h3>
+        <ul class="rules">
+          <li>Needs, constraints, assumptions, and contexts.</li>
+          <li>Functional requirements (FRs) with acceptance criteria.</li>
+          <li>Design parameters (DPs) and the decision state of each one.</li>
+          <li>Influences between DPs and FRs, each with a reason.</li>
+          <li>Modules, process variables (PVs), flows, and scenarios.</li>
+          <li><code>expect</code> blocks that test the result.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>The tool derives the results</h3>
+        <ul class="rules">
+          <li>A design matrix for each group of sibling FRs and DPs.</li>
+          <li>A master matrix over all leaf FRs and DPs.</li>
+          <li>The classification: uncoupled, decoupled, or coupled.</li>
+          <li>The design order in which to fix the DPs.</li>
+          <li>Missing criteria, modules, and scenarios.</li>
+          <li>Each claim that has no reviewed support.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-dark" id="ideas" aria-labelledby="ideas-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Core ideas</span>
+      <h2 id="ideas-title">Four ideas carry the whole language</h2>
+    </div>
+    <div class="grid grid-2">
+      <div class="card">
+        <span class="tag">fr</span>
+        <h3>An FR states an outcome</h3>
+        <p>A functional requirement says what the software must give, for example "Save a new note." An acceptance criterion says when it succeeds, for example "within 200 ms".</p>
+      </div>
+      <div class="card">
+        <span class="tag">dp</span>
+        <h3>A DP controls an outcome</h3>
+        <p>A design parameter is the part of the design that controls an FR, for example "a table with one row for each note". A process variable (PV) is the code or resource that makes the DP real.</p>
+      </div>
+      <div class="card">
+        <span class="tag">influence</span>
+        <h3>Unknown is not zero</h3>
+        <p>Each influence says that a DP has a material effect on an FR, no effect, or an unknown effect. A cell that nobody wrote is unknown. The tool never guesses a zero.</p>
+      </div>
+      <div class="card">
+        <span class="tag">support_gap</span>
+        <h3>A claim is not a proof</h3>
+        <p>An effect that you write is a claim. A valid model does not prove that the design is independent or that code exists. The report says which claims have no reviewed support.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="matrix" aria-labelledby="matrix-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The design matrix</span>
+      <h2 id="matrix-title">Three kinds of design</h2>
+      <p>The matrix has one row for each FR and one column for each DP. <code>X</code> is a material effect, <code>0</code> is no effect with a reason, and <code>?</code> is unknown. The Independence Axiom says: keep the FRs independent of each other.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card matrix-card">
+        <span class="verdict">Uncoupled</span>
+        <table class="matrix" aria-label="Uncoupled matrix">
+          <tr><th scope="col"></th><th scope="col">DP1</th><th scope="col">DP2</th></tr>
+          <tr><th scope="row">FR1</th><td class="x">X</td><td class="z">0</td></tr>
+          <tr><th scope="row">FR2</th><td class="z">0</td><td class="x">X</td></tr>
+        </table>
+        <p class="muted">Each DP changes only its own FR. You can set the DPs in any order.</p>
+      </div>
+      <div class="card matrix-card">
+        <span class="verdict">Decoupled</span>
+        <table class="matrix" aria-label="Decoupled matrix">
+          <tr><th scope="col"></th><th scope="col">DP1</th><th scope="col">DP2</th></tr>
+          <tr><th scope="row">FR1</th><td class="x">X</td><td class="z">0</td></tr>
+          <tr><th scope="row">FR2</th><td class="x">X</td><td class="x">X</td></tr>
+        </table>
+        <p class="muted">The effects form a triangle. Set DP1 first, then DP2. You never go back.</p>
+      </div>
+      <div class="card matrix-card">
+        <span class="verdict">Coupled</span>
+        <table class="matrix" aria-label="Coupled matrix">
+          <tr><th scope="col"></th><th scope="col">DP1</th><th scope="col">DP2</th></tr>
+          <tr><th scope="row">FR1</th><td class="x">X</td><td class="x">X</td></tr>
+          <tr><th scope="row">FR2</th><td class="x">X</td><td class="x">X</td></tr>
+        </table>
+        <p class="muted">No order gives a triangle. A change to one DP forces changes to the other.</p>
+      </div>
+    </div>
+    <div class="note" style="margin-top: var(--s5)">
+      <p>If one cell is <code>?</code>, the tool reports the classification as <code>unresolved</code>. You must state every cell, one by one or with a default.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="example" aria-labelledby="example-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">An example</span>
+      <h2 id="example-title">A notes app in one file</h2>
+      <p>The app saves notes and finds them by a word. The index reads the stored rows, but the save replies before the index updates.</p>
+    </div>
+    <div class="grid grid-2">
+      <div>
+        <div class="code"><pre><code><span class="err">fr</span> <span class="s">"save_note"</span> {
+  need      = [need.keep_ideas]
+  statement = <span class="s">"Save a new note."</span>
+  <span class="err">criterion</span> <span class="s">"save_time"</span> {
+    metric = <span class="s">"milliseconds to the reply"</span>
+    op     = <span class="s">"&lt;="</span>
+    value  = <span class="m">200</span>
+    unit   = <span class="s">"ms"</span>
+  }
+}
+
+<span class="err">dp</span> <span class="s">"note_store"</span> {
+  controls       = [fr.save_note]
+  responsibility = <span class="s">"Write each note as one row."</span>
+  decision       = <span class="s">"selected"</span>
+}
+
+<span class="err">influence</span> {
+  from      = [dp.note_store]
+  to        = fr.find_notes
+  effect    = <span class="s">"material"</span>
+  mechanism = <span class="s">"The index reads the stored rows."</span>
+}
+
+<span class="err">influence</span> {
+  from    = [dp.word_index]
+  to      = fr.save_note
+  effect  = <span class="s">"none"</span>
+  because = <span class="s">"The index updates after the reply."</span>
+}</code></pre></div>
+      </div>
+      <div>
+        <h3>The matrix that the tool derives</h3>
+        <table class="matrix" aria-label="Matrix of the notes app" style="margin-bottom: var(--s5)">
+          <tr><th scope="col"></th><th scope="col">note_store</th><th scope="col">word_index</th></tr>
+          <tr><th scope="row">save_note</th><td class="x">X</td><td class="z">0</td></tr>
+          <tr><th scope="row">find_notes</th><td class="x">X</td><td class="x">X</td></tr>
+        </table>
+        <h3>Part of the report</h3>
+        <div class="code report"><pre><code>Scopes
+- Scope design.notes: decoupled.
+  Support: unresolved (structural
+    classification alone is not support).
+  Pairing: fr.find_notes with dp.word_index,
+    fr.save_note with dp.note_store
+  Order: dp.note_store, dp.word_index</code></pre></div>
+        <p>The design is decoupled. Decide <code>note_store</code> first, because it affects both FRs. If you change the row format later, you must test <code>find_notes</code> again.</p>
+        <p><a href="learn.html#lesson-3-your-first-model">Build this model step by step in the course</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="rules" aria-labelledby="rules-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Rules</span>
+      <h2 id="rules-title">The rules of the language</h2>
+      <p>The language is native HCL, the syntax that Terraform uses. The rules are stricter than Terraform, so that a model means one thing only.</p>
+    </div>
+    <div class="grid grid-2">
+      <ol class="steps">
+        <li>Write each fact once. Never write a matrix, an ID number, or a classification by hand.</li>
+        <li>An influence with <code>effect = "material"</code> needs a <code>mechanism</code>. An influence with <code>effect = "none"</code> needs a <code>because</code>.</li>
+        <li>Mark your own reasoning with <code>origin = "inferred"</code> or <code>mechanism_source = "inferred"</code>.</li>
+        <li>Do not invent targets, mechanisms, or probabilities. Leave the gap, and let the tool report it.</li>
+      </ol>
+      <ol class="steps" start="5" style="counter-reset: step 4">
+        <li>A reference is <code>fr.save_note</code>, not the string <code>"fr.save_note"</code>.</li>
+        <li>Labels use snake_case. Keep source IDs such as <code>FR11</code> in <code>alias</code>.</li>
+        <li>No arithmetic, functions, conditions, or templates. Each value is a literal.</li>
+        <li>Unknown blocks, unknown fields, and <code>null</code> are errors. The tool ignores nothing.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="files" aria-labelledby="files-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Files</span>
+      <h2 id="files-title">Three kinds of file</h2>
+      <p>Core files hold the design facts. Data for other tools goes into attachments, so it cannot change a core fact.</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">Suffix</th><th scope="col">Contents</th><th scope="col">Loaded when</th></tr></thead>
+        <tbody>
+          <tr><td><code>.ad.hcl</code></td><td>Core facts: the design root, needs, FRs, DPs, influences, decisions, modules, and scenarios.</td><td>You give one file, or a folder. A folder merges its direct <code>*.ad.hcl</code> files.</td></tr>
+          <tr><td><code>.ad.ext.hcl</code></td><td>Attachments: a Terraform binding on a PV, a link to a behavior model on a module, or a view on the design.</td><td>Only when a manifest lists the file.</td></tr>
+          <tr><td><code>.ad.project.hcl</code></td><td>The manifest: the list of core files, attachment files, and extension owners.</td><td>You give the manifest path.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Split a large model by domain and by branch. Never put the FRs in one file and the DPs in another file. Put each influence that crosses branches in the file of the nearest common parent.</p>
+  </div>
+</section>
+
+<section class="band band-dark" id="adhcl" aria-labelledby="adhcl-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The tool</span>
+      <h2 id="adhcl-title">adhcl reads the model and writes a report</h2>
+      <p class="lead">adhcl is a command line tool in Go. It parses the input, resolves the references, runs the core assessment, and prints a text report. It reads files only. It does not run your code or connect to a network.</p>
+    </div>
+    <div class="grid grid-2">
+      <div>
+        <h3>Install</h3>
+        <p>You need Go 1.25 or later.</p>
+        <ol class="steps">
+          <li>Clone the repository: <code>git clone https://github.com/axiomatic-design-hcl/adhcl.git</code></li>
+          <li>Go into the folder and run <code>make build</code>. The binary goes to <code>bin/adhcl</code>.</li>
+          <li>Run <code>bin/adhcl version</code>. A local build prints <code>adhcl dev</code>.</li>
+        </ol>
+      </div>
+      <div>
+        <h3>Commands</h3>
+        <div class="code"><pre><code>adhcl version
+adhcl validate [--profile source|architecture]
+               [--candidate REF] [--context REF]
+               [--] PATH
+adhcl --help</code></pre></div>
+        <p class="muted"><code>PATH</code> is one <code>.ad.hcl</code> file, a folder, or a <code>.ad.project.hcl</code> manifest. Put the options before the path.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="profiles" aria-labelledby="profiles-title">
+  <div class="wrap">
+    <div class="grid grid-2">
+      <div>
+        <span class="eyebrow">Profiles</span>
+        <h2 id="profiles-title" style="margin-bottom: var(--s4)">Two levels of strictness</h2>
+        <p>A profile changes the severity of some findings. It does not change the claims in the model.</p>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th scope="col">Profile</th><th scope="col">Use it for</th></tr></thead>
+            <tbody>
+              <tr><td><code>source</code></td><td>The default. Early designs and models of a paper. Gaps such as a missing criterion, module, or scenario are warnings.</td></tr>
+              <tr><td><code>architecture</code></td><td>A design that is ready to build. The same gaps are errors.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>These codes are warnings under <code>source</code> and errors under <code>architecture</code>: <code>incomplete_criterion</code>, <code>incomplete_module_contract</code>, <code>missing_leaf_scenario</code>, <code>incomplete_feedback_contract</code>, <code>unresolved_refinement</code>, <code>unresolved_applicability</code>, <code>unresolved_influence</code>, and <code>shared_resource_review_gap</code>.</p>
+      </div>
+      <div>
+        <span class="eyebrow">Exit codes</span>
+        <h2 style="margin-bottom: var(--s4)">What the result means</h2>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th scope="col">Code</th><th scope="col">Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code class="sev-ok">0</code></td><td>Validation completed with no error findings.</td></tr>
+              <tr><td><code class="sev-error">1</code></td><td>An input, parse, assessment, attachment, or output step failed.</td></tr>
+              <tr><td><code class="sev-warning">2</code></td><td>The command line is wrong.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">
+          <p>Exit code 0 does not prove that the design is independent, that it is built, or that observations support it.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="report" aria-labelledby="report-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The report</span>
+      <h2 id="report-title">Five parts, always in the same order</h2>
+    </div>
+    <div class="grid grid-2">
+      <ol class="steps">
+        <li>The header: input, tool version, contract, profile, candidate, context, and workload.</li>
+        <li>Findings: each error and warning, with its code, subject, file, line, and message.</li>
+        <li>Scopes: the classification, pairing, design order, and cycles of each matrix.</li>
+        <li>Owners: the result of each attachment.</li>
+        <li>Summary: the counts, the status of each stage, and the open causes.</li>
+      </ol>
+      <div class="code report"><pre><code>Findings
+- <span class="sev-error">error</span> invalid_reference on dp.wordindex
+  at notes.ad.hcl:67:11: dp.wordindex does not
+  name a declared block. This field needs a dp.
+- <span class="sev-warning">warning</span> support_gap on notes.ad.hcl:45-50:
+  The claimed influence from dp.note_store
+  to fr.save_note has no reviewed support.</code></pre></div>
+    </div>
+    <p>Each code is stable. The <a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/diagnostics.md">diagnostic contract</a> lists all codes and their severity in each profile.</p>
+  </div>
+</section>
+
+<section class="band" id="owners" aria-labelledby="owners-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Attachments</span>
+      <h2 id="owners-title">Three built-in owners</h2>
+      <p>An owner reads one kind of attachment. The manifest declares each owner in an <code>extension</code> block. An attachment cannot change a core fact or a matrix cell.</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">Owner</th><th scope="col">Role</th><th scope="col">Subject</th><th scope="col">Data fields</th><th scope="col">Result in adhcl</th></tr></thead>
+        <tbody>
+          <tr><td><code>terraform_binding</code></td><td>binding</td><td><code>pv</code></td><td><code>address</code>, <code>observation_source</code></td><td><code>unknown</code>, with a warning. adhcl gets no observations.</td></tr>
+          <tr><td><code>event_model_link</code></td><td>behavior link</td><td><code>module</code></td><td><code>model</code>, <code>revision</code>, <code>target_kind = "slice"</code>, <code>target_label</code></td><td><code>unknown</code>, with a warning. adhcl gets no behavior model.</td></tr>
+          <tr><td><code>html_view</code></td><td>view</td><td><code>design</code></td><td><code>layout</code>, <code>show_source_locations = true</code></td><td><code>valid</code> when the data is correct. adhcl does not render HTML.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="band band-dark" id="status" aria-labelledby="status-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Status</span>
+      <h2 id="status-title">What exists today</h2>
+    </div>
+    <div class="grid grid-3">
+      <div class="card">
+        <span class="tag">spec</span>
+        <h3>The specification</h3>
+        <p>The language reference, field schema, assessment contract, diagnostic contract, and conformance cases for <code>requirements_hcl/core/1</code>.</p>
+      </div>
+      <div class="card">
+        <span class="tag">adhcl</span>
+        <h3>The validator</h3>
+        <p>The <code>version</code> and <code>validate</code> commands. adhcl pins one revision of the specification and copies it into its test data.</p>
+      </div>
+      <div class="card">
+        <span class="tag">not yet</span>
+        <h3>Open work</h3>
+        <p>Matrix, impact, and HTML reports, live observations for bindings, and external behavior models. Those owner results stay <code>unknown</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="learn" aria-labelledby="learn-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Course</span>
+      <h2 id="learn-title">Learn the language in fifteen lessons</h2>
+      <p>You build one model from an empty file to a complete design. You predict each result, run the tool, and compare. Each lesson ends with questions that you answer from memory.</p>
+    </div>
+    <div class="grid grid-3" style="margin-bottom: var(--s6)">
+      <div class="card">
+        <span class="tag">Lessons 1 to 6</span>
+        <h3>The basics</h3>
+        <p>The method, the syntax, needs, FRs, acceptance criteria, DPs, and influences.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Lessons 7 to 11</span>
+        <h3>Read and repair</h3>
+        <p>The report, errors on purpose, coupled designs, <code>expect</code> tests, and child FRs.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Lessons 12 to 15</span>
+        <h3>Toward code</h3>
+        <p>Modules, scenarios, assumptions, many files, attachments, decisions, and evidence.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="learn.html">Start lesson 1</a>
+      <a class="btn" href="learn.html#quick-reference">Open the quick reference</a>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="references" aria-labelledby="ref-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Reference</span>
+      <h2 id="ref-title">Go deeper</h2>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">Document</th><th scope="col">What it gives you</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/language.md">Language reference</a></td><td>Every block and rule, with the reasons.</td></tr>
+          <tr><td><a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/schema.md">Field schema</a></td><td>Every field, its type, and when it is required.</td></tr>
+          <tr><td><a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/assessment-contract.md">Assessment contract</a></td><td>How the tool derives matrices, support, and feasibility.</td></tr>
+          <tr><td><a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/diagnostics.md">Diagnostic contract</a></td><td>Every finding code and its severity.</td></tr>
+          <tr><td><a href="https://github.com/axiomatic-design-hcl/spec/tree/main/examples/starter">Starter example</a></td><td>A complete project with a manifest and all three attachment kinds.</td></tr>
+          <tr><td><a href="https://github.com/axiomatic-design-hcl/adhcl#readme">adhcl README</a></td><td>The command line, inputs, output, and exit codes.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>RequirementsHCL and adhcl. Open source on <a href="https://github.com/axiomatic-design-hcl">GitHub</a>.</span>
+    <span><a href="learn.html">Learn the language</a></span>
+  </div>
+</footer>
+<script src="assets/site.js" defer></script>
+</body>
+</html>

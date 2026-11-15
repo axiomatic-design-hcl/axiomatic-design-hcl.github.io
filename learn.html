@@ -1,0 +1,1680 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learn .ad.hcl</title>
+<meta name="description" content="A step-by-step course in the .ad.hcl language. You build one model, run adhcl after each step, and learn to read its reports.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the lessons</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brand-mark">AD</span> RequirementsHCL</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html#what">The language</a>
+      <a href="index.html#adhcl">The adhcl tool</a>
+      <a href="learn.html" aria-current="page">Learn</a>
+      <a href="https://github.com/axiomatic-design-hcl">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap learn-layout">
+  <aside class="toc" aria-label="Lessons">
+    <div class="toc-inner">
+      <div class="progress">
+        <span class="progress-text">Progress is saved in this browser</span>
+        <div class="progress-bar" aria-hidden="true"><span></span></div>
+      </div>
+      <details open>
+        <summary>Contents</summary>
+        <ol>
+<li><a href="#what-you-can-do-at-the-end" data-nav="what-you-can-do-at-the-end">What you can do at the end</a></li>
+<li><a href="#before-you-start" data-nav="before-you-start">Before you start</a></li>
+<li><a href="#how-this-guide-teaches" data-nav="how-this-guide-teaches">How this guide teaches</a></li>
+<li><a href="#set-up-the-tool" data-nav="set-up-the-tool">Set up the tool</a></li>
+<li class="is-lesson"><a href="#lesson-1-the-idea-behind-axiomatic-design" data-nav="lesson-1-the-idea-behind-axiomatic-design">Lesson 1: The idea behind Axiomatic Design</a></li>
+<li class="is-lesson"><a href="#lesson-2-how-an-adhcl-file-looks" data-nav="lesson-2-how-an-adhcl-file-looks">Lesson 2: How an .ad.hcl file looks</a></li>
+<li class="is-lesson"><a href="#lesson-3-your-first-model" data-nav="lesson-3-your-first-model">Lesson 3: Your first model</a></li>
+<li class="is-lesson"><a href="#lesson-4-acceptance-criteria" data-nav="lesson-4-acceptance-criteria">Lesson 4: Acceptance criteria</a></li>
+<li class="is-lesson"><a href="#lesson-5-design-parameters" data-nav="lesson-5-design-parameters">Lesson 5: Design parameters</a></li>
+<li class="is-lesson"><a href="#lesson-6-influences-in-detail" data-nav="lesson-6-influences-in-detail">Lesson 6: Influences in detail</a></li>
+<li class="is-lesson"><a href="#lesson-7-read-the-whole-report" data-nav="lesson-7-read-the-whole-report">Lesson 7: Read the whole report</a></li>
+<li class="is-lesson"><a href="#lesson-8-learn-from-errors" data-nav="lesson-8-learn-from-errors">Lesson 8: Learn from errors</a></li>
+<li class="is-lesson"><a href="#lesson-9-coupled-designs" data-nav="lesson-9-coupled-designs">Lesson 9: Coupled designs</a></li>
+<li class="is-lesson"><a href="#lesson-10-tests-with-expect" data-nav="lesson-10-tests-with-expect">Lesson 10: Tests with expect</a></li>
+<li class="is-lesson"><a href="#lesson-11-break-an-fr-down" data-nav="lesson-11-break-an-fr-down">Lesson 11: Break an FR down</a></li>
+<li class="is-lesson"><a href="#lesson-12-from-design-to-code" data-nav="lesson-12-from-design-to-code">Lesson 12: From design to code</a></li>
+<li class="is-lesson"><a href="#lesson-13-premises-and-contexts" data-nav="lesson-13-premises-and-contexts">Lesson 13: Premises and contexts</a></li>
+<li class="is-lesson"><a href="#lesson-14-split-the-model-and-add-attachments" data-nav="lesson-14-split-the-model-and-add-attachments">Lesson 14: Split the model and add attachments</a></li>
+<li class="is-lesson"><a href="#lesson-15-decisions-and-evidence" data-nav="lesson-15-decisions-and-evidence">Lesson 15: Decisions and evidence</a></li>
+<li><a href="#mixed-review" data-nav="mixed-review">Mixed review</a></li>
+<li><a href="#final-exercise-a-link-shortener" data-nav="final-exercise-a-link-shortener">Final exercise: a link shortener</a></li>
+<li><a href="#review-plan" data-nav="review-plan">Review plan</a></li>
+<li><a href="#quick-reference" data-nav="quick-reference">Quick reference</a></li>
+<li><a href="#where-to-go-next" data-nav="where-to-go-next">Where to go next</a></li>
+        </ol>
+      </details>
+    </div>
+  </aside>
+
+  <main id="main" class="doc">
+    <div class="doc-hero">
+      <span class="eyebrow">Course &middot; about three hours</span>
+      <h1>Learn the .ad.hcl language</h1>
+      <p class="muted">The source of this page is <a href="https://github.com/axiomatic-design-hcl/axiomatic-design-hcl.github.io/blob/main/learn-ad-hcl.md">learn-ad-hcl.md</a>.</p>
+    </div>
+<p>This guide teaches you to write and read <code>.ad.hcl</code> files.
+An <code>.ad.hcl</code> file describes a software design with the method of Axiomatic Design (AD).
+You write what the software must do, how the design does it, and how the parts affect each other.
+The <code>adhcl</code> tool reads the file, builds the design matrices, and reports gaps and errors.</p>
+<p>You build one small model from an empty file to a complete design.
+Each lesson adds one idea, and you run the tool after each step.
+Every report in this guide comes from real runs of <code>adhcl</code> on the example files.</p>
+<section id="sec-what-you-can-do-at-the-end" class="doc-section"><h2 id="what-you-can-do-at-the-end">What you can do at the end</h2>
+<p>After the guide, you can do these tasks without help:</p>
+<ol>
+<li>Explain the terms need, functional requirement (FR), design parameter (DP), and process variable (PV).</li>
+<li>Write a design root, needs, FRs with acceptance criteria, and DPs.</li>
+<li>Write influences with the correct effect: <code>material</code>, <code>none</code>, or <code>unknown</code>.</li>
+<li>Predict if a design is uncoupled, decoupled, or coupled before you run the tool.</li>
+<li>Read an <code>adhcl</code> report and fix each error that it names.</li>
+<li>Break an FR into child FRs, and add modules and scenarios for the architecture profile.</li>
+<li>Split a model into files and add a project manifest with attachments.</li>
+</ol>
+</section><section id="sec-before-you-start" class="doc-section"><h2 id="before-you-start">Before you start</h2>
+<p>You need three things:</p>
+<ol>
+<li>Basic experience with a text editor and a terminal.</li>
+<li>Go 1.25 or later, to build the <code>adhcl</code> tool.</li>
+<li>About three hours, in several short sessions.</li>
+</ol>
+<p>You do not need to know HCL or Axiomatic Design before you start.
+If you know Terraform, the syntax is familiar, but the rules are stricter.</p>
+</section><section id="sec-how-this-guide-teaches" class="doc-section"><h2 id="how-this-guide-teaches">How this guide teaches</h2>
+<p>The guide uses methods from learning research.
+These methods feel harder than reading, and that extra effort is the part that makes you remember.
+Use the guide in this way:</p>
+<ol>
+<li>Type each example. Do not copy and paste it. Typing makes you notice each field.</li>
+<li>When the guide asks you to predict, write your prediction down before you run the tool.</li>
+<li>Answer each "Test yourself" question from memory. Then open the answer.</li>
+<li>When a question is hard, do not reread the lesson first. Try to answer, then look back.</li>
+<li>Do the review questions again one day later and one week later.</li>
+</ol>
+<p>A wrong prediction is useful.
+It shows you the exact idea that you must learn next.</p>
+</section><section id="sec-set-up-the-tool" class="doc-section"><h2 id="set-up-the-tool">Set up the tool</h2>
+<p>The <code>adhcl</code> tool is in the <code>adhcl</code> repository of the <code>axiomatic-design-hcl</code> organization.
+It needs Go 1.25 or later.</p>
+<ol>
+<li>Clone the repository: <code>git clone https://github.com/axiomatic-design-hcl/adhcl.git</code></li>
+<li>Go into the folder: <code>cd adhcl</code></li>
+<li>Build the tool: <code>make build</code>. The binary goes to <code>bin/adhcl</code>.</li>
+<li>Add the <code>bin</code> folder to your <code>PATH</code>, or call the tool with its full path.</li>
+<li>Run <code>adhcl version</code>. A local build prints <code>adhcl dev</code>.</li>
+</ol>
+<p>Make a new empty folder for your work, for example <code>~/learn-adhcl</code>.
+All the files in this guide go into that folder.</p>
+<p>The tool has one main command:</p>
+<div class="code"><pre><span></span><code>adhcl<span class="w"> </span>validate<span class="w"> </span><span class="o">[</span>--profile<span class="w"> </span>source<span class="p">|</span>architecture<span class="o">]</span><span class="w"> </span>PATH
+</code></pre></div>
+
+<p><code>PATH</code> is one <code>.ad.hcl</code> file, a folder of <code>.ad.hcl</code> files, or a <code>.ad.project.hcl</code> manifest.
+The <code>source</code> profile is the default.
+The tool writes a text report to the terminal.
+The exit code is 0 when the report has no errors, 1 when it has errors, and 2 when the command line is wrong.</p>
+
+</section><section id="sec-lesson-1-the-idea-behind-axiomatic-design" class="doc-section" data-lesson="lesson-1-the-idea-behind-axiomatic-design"><h2 id="lesson-1-the-idea-behind-axiomatic-design">Lesson 1: The idea behind Axiomatic Design</h2>
+<p>Axiomatic Design describes a design as a set of mappings between domains.
+A domain is one kind of description of the same product.
+Each mapping goes from "what" to "how":</p>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Question</th>
+<th>Example for a notes app</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Need</td>
+<td>Why does the user want it?</td>
+<td>Write down an idea fast and find it again later.</td>
+</tr>
+<tr>
+<td>Functional requirement (FR)</td>
+<td>What outcome must the software give?</td>
+<td>Save a new note.</td>
+</tr>
+<tr>
+<td>Design parameter (DP)</td>
+<td>Which part of the design controls that outcome?</td>
+<td>A table that stores one row for each note.</td>
+</tr>
+<tr>
+<td>Process variable (PV)</td>
+<td>Which code or resource makes the DP real?</td>
+<td>The <code>notes</code> table in a database.</td>
+</tr>
+</tbody>
+</table>
+<p>An FR states an outcome.
+A DP controls an outcome.
+A PV realizes a DP.</p>
+<h3 id="the-design-matrix">The design matrix</h3>
+<p>The design matrix shows which DP affects which FR.
+It has one row for each FR and one column for each DP.
+Each cell has one of three values:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>X</code></td>
+<td>The DP has a material effect on the FR. A change to the DP can make the FR fail its target.</td>
+</tr>
+<tr>
+<td><code>0</code></td>
+<td>The DP has no material effect on the FR. The author gives a reason.</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>Nobody knows yet.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>?</code> value is important in this language.
+An empty cell is never a silent zero.
+If you do not state a fact, the tool treats it as unknown.</p>
+<h3 id="three-kinds-of-design">Three kinds of design</h3>
+<p>The Independence Axiom says this: keep the FRs independent of each other.
+In a good design, you can adjust each FR with its own DP and not break the other FRs.
+The matrix tells you how well the design does this:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Matrix shape</th>
+<th>What it means for you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uncoupled</td>
+<td>Only the diagonal has <code>X</code>.</td>
+<td>Each DP changes only its own FR. You can set the DPs in any order.</td>
+</tr>
+<tr>
+<td>Decoupled</td>
+<td>The <code>X</code> cells form a triangle.</td>
+<td>You can set the DPs in one fixed order and not go back.</td>
+</tr>
+<tr>
+<td>Coupled</td>
+<td>No order makes a triangle.</td>
+<td>A change to one DP forces changes to others, maybe again and again.</td>
+</tr>
+</tbody>
+</table>
+<p>Here are three small matrices, with FRs as rows and DPs as columns:</p>
+<div class="code"><pre><span></span><code>Uncoupled         Decoupled         Coupled
+     DP1 DP2           DP1 DP2           DP1 DP2
+FR1   X   0       FR1   X   0       FR1   X   X
+FR2   0   X       FR2   X   X       FR2   X   X
+</code></pre></div>
+
+<p>In the decoupled matrix, DP1 affects FR1 and FR2.
+So you set DP1 first, then set DP2 to fix FR2.
+The tool calls this the design order.</p>
+<p>A matrix shows a structure, not a proof.
+An <code>X</code> or a <code>0</code> is a claim by the author.
+The tool reports when a claim has no reviewed support.</p>
+<h3 id="test-yourself">Test yourself</h3>
+<p>Answer each question from memory before you open the answer.</p>
+<ol>
+<li>What is the difference between an FR and a DP?</li>
+<li>In this language, what does a cell that nobody wrote mean?</li>
+<li>A matrix has <code>X</code> in cells (FR1, DP1), (FR2, DP2), and (FR1, DP2). Which kind of design is it, and which DP do you set first?</li>
+</ol>
+<details>
+<summary>Answers</summary>
+<ol>
+<li>An FR states an outcome that the software must give. A DP is the part of the design that controls that outcome.</li>
+<li>It means unknown (<code>?</code>). It is not a zero.</li>
+<li>It is decoupled. DP2 affects FR1 and FR2, so you set DP2 first, then DP1. The order is DP2, DP1.</li>
+</ol>
+</details>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-1-the-idea-behind-axiomatic-design" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-2-how-an-adhcl-file-looks" class="doc-section" data-lesson="lesson-2-how-an-adhcl-file-looks"><h2 id="lesson-2-how-an-adhcl-file-looks">Lesson 2: How an .ad.hcl file looks</h2>
+<p>An <code>.ad.hcl</code> file uses the native syntax of HCL.
+HCL is the configuration language that Terraform uses.
+The file is a list of blocks.</p>
+<div class="code"><pre><span></span><code><span class="err">fr</span><span class="w"> </span><span class="s2">&quot;save_note&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">need</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">need.keep_ideas</span><span class="p">]</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Save a new note.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This example has these parts:</p>
+<ol>
+<li><code>fr</code> is the block type. Here it is a functional requirement.</li>
+<li><code>"save_note"</code> is the label. It is the name of the block.</li>
+<li><code>need</code> and <code>statement</code> are attributes. Each one has a name, an equals sign, and a value.</li>
+<li><code>"Save a new note."</code> is a string value.</li>
+<li><code>need.keep_ideas</code> is a reference. It points to the block <code>need "keep_ideas"</code>.</li>
+<li><code>[ ... ]</code> is a list.</li>
+</ol>
+<h3 id="rules-that-hcl-alone-does-not-have">Rules that HCL alone does not have</h3>
+<p>The language is stricter than Terraform.
+These rules apply to every file:</p>
+<ol>
+<li>A label uses lower case letters, digits, and single underscores. It starts with a letter. <code>save_note</code> is correct. <code>SaveNote</code> and <code>save__note</code> are errors.</li>
+<li>A reference has the form <code>TYPE.LABEL</code>, without quotes. <code>fr.save_note</code> is a reference. <code>"fr.save_note"</code> is only a string, and the tool rejects it in a reference field.</li>
+<li>A nested block has a longer reference. A criterion <code>save_time</code> inside <code>fr "save_note"</code> is <code>fr.save_note.criterion.save_time</code>.</li>
+<li>You cannot calculate. Arithmetic, function calls, conditions, and <code>${...}</code> templates are errors. Write each value as a literal.</li>
+<li>Unknown blocks, unknown fields, and <code>null</code> are errors. The tool does not ignore them.</li>
+<li>Each label is unique inside its block type. <code>fr.search</code> and <code>dp.search</code> can both exist.</li>
+<li>Comments use <code>#</code>, as in HCL.</li>
+</ol>
+<p>To keep the source IDs of a paper or a team, use the <code>alias</code> field, for example <code>alias = "FR1"</code>.
+Do not put those IDs in the label.</p>
+<h3 id="test-yourself_1">Test yourself</h3>
+<p>This block has three errors. Find them before you open the answer.</p>
+<div class="code"><pre><span></span><code><span class="err">dp</span><span class="w"> </span><span class="s2">&quot;WordIndex&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">controls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;fr.find_notes&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">responsibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Map each word to its notes.&quot;</span>
+<span class="w">  </span><span class="na">decision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;selected&quot;</span>
+<span class="w">  </span><span class="na">cache_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="err">*</span><span class="w"> </span><span class="m">1024</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<details>
+<summary>Answers</summary>
+<ol>
+<li>The label <code>WordIndex</code> has upper case letters. Use <code>word_index</code>.</li>
+<li><code>"fr.find_notes"</code> is a string. Use the reference <code>fr.find_notes</code> without quotes.</li>
+<li><code>cache_size</code> is not a DP field, and <code>100 * 1024</code> is arithmetic. Both are errors. Put that kind of detail in <code>responsibility</code> as text.</li>
+</ol>
+</details>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-2-how-an-adhcl-file-looks" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-3-your-first-model" class="doc-section" data-lesson="lesson-3-your-first-model"><h2 id="lesson-3-your-first-model">Lesson 3: Your first model</h2>
+<p>In this lesson you write the start of a notes app.
+The app saves short text notes and finds them by a word.
+You write three kinds of blocks:</p>
+<table>
+<thead>
+<tr>
+<th>Block</th>
+<th>Purpose</th>
+<th>Required fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>design</code></td>
+<td>The root of the model. Each model has exactly one.</td>
+<td><code>boundary</code></td>
+</tr>
+<tr>
+<td><code>need</code></td>
+<td>Why a user wants the software.</td>
+<td><code>statement</code></td>
+</tr>
+<tr>
+<td><code>fr</code></td>
+<td>An outcome that the software must give.</td>
+<td><code>statement</code>. A top-level FR also needs <code>need</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>boundary</code> says what is in the design and what is outside it.
+The <code>origin</code> field says where a fact comes from: <code>user</code>, <code>source</code>, <code>proposed</code>, or <code>inferred</code>.
+Here the need is your own proposal, so it uses <code>origin = "proposed"</code>.</p>
+<p>Make a file <code>notes.ad.hcl</code> and type this text:</p>
+<div class="code"><pre><span></span><code><span class="err">design</span><span class="w"> </span><span class="s2">&quot;notes&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">boundary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Save short text notes and find them by a word. User accounts and sync are outside the boundary.&quot;</span>
+<span class="p">}</span>
+
+<span class="err">need</span><span class="w"> </span><span class="s2">&quot;keep_ideas&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Write down an idea fast and find it again later.&quot;</span>
+<span class="w">  </span><span class="na">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;proposed&quot;</span>
+<span class="p">}</span>
+
+<span class="err">fr</span><span class="w"> </span><span class="s2">&quot;save_note&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">need</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">need.keep_ideas</span><span class="p">]</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Save a new note.&quot;</span>
+<span class="p">}</span>
+
+<span class="err">fr</span><span class="w"> </span><span class="s2">&quot;find_notes&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">need</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">need.keep_ideas</span><span class="p">]</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Return the notes that contain a search word.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3 id="predict-then-run">Predict, then run</h3>
+<p>The model has two FRs and no DPs.
+Before you run the tool, write down your answers to these two questions:</p>
+<ol>
+<li>Do you expect an error or only warnings?</li>
+<li>Which problem do you expect the tool to name first?</li>
+</ol>
+<p>Now run the tool:</p>
+<div class="code"><pre><span></span><code>adhcl<span class="w"> </span>validate<span class="w"> </span>notes.ad.hcl
+</code></pre></div>
+
+<p>The findings part of the report is this:</p>
+<div class="code"><pre><span></span><code>Findings
+- error uncontrolled_requirement on design.notes: Requirement fr.save_note has no distinct control in scope design.notes.
+- error uncontrolled_requirement on design.notes: Requirement fr.find_notes has no distinct control in scope design.notes.
+- error uncontrolled_requirement on master: Requirement fr.save_note has no distinct control in scope master.
+- error uncontrolled_requirement on master: Requirement fr.find_notes has no distinct control in scope master.
+- warning incomplete_criterion on fr.save_note at notes.ad.hcl:10:1: Requirement fr.save_note has no applicable criterion with a metric, operator, and value, so no operational predicate checks it.
+- warning missing_leaf_scenario on fr.save_note at notes.ad.hcl:10:1: Leaf requirement fr.save_note has no applicable scenario with steps that verifies all of its applicable criteria.
+- warning incomplete_criterion on fr.find_notes at notes.ad.hcl:15:1: Requirement fr.find_notes has no applicable criterion with a metric, operator, and value, so no operational predicate checks it.
+- warning missing_leaf_scenario on fr.find_notes at notes.ad.hcl:15:1: Leaf requirement fr.find_notes has no applicable scenario with steps that verifies all of its applicable criteria.
+</code></pre></div>
+
+<p>The exit code is 1, because the report has errors.</p>
+<h3 id="read-the-findings">Read the findings</h3>
+<p>Each finding has a severity, a code, a subject, a location, and a message.
+The code is stable, so you can look it up in the <a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/diagnostics.md">diagnostic contract</a>.</p>
+<p>An error makes the run fail.
+A warning records a gap, but the run can still pass.</p>
+<p>The <code>uncontrolled_requirement</code> error says that no DP controls each FR.
+Every FR needs its own DP.
+You add the DPs in Lesson 5.</p>
+<p>The tool reports each problem twice: for the scope <code>design.notes</code> and for the scope <code>master</code>.
+A scope is one group of sibling FRs and DPs.
+The <code>master</code> scope is the matrix over all leaf FRs and leaf DPs of the whole design.
+In a model with one level, the two scopes are the same.</p>
+<p>The warnings name two more gaps.
+The FRs have no acceptance criteria, and no scenario tests them.
+You fix the criteria in the next lesson and the scenarios in Lesson 12.</p>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-3-your-first-model" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-4-acceptance-criteria" class="doc-section" data-lesson="lesson-4-acceptance-criteria"><h2 id="lesson-4-acceptance-criteria">Lesson 4: Acceptance criteria</h2>
+<p>An FR without a target is only a wish.
+A <code>criterion</code> block inside an <code>fr</code> block states when the FR succeeds.
+An operational criterion has three fields that go together:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>metric</code></td>
+<td>What you measure.</td>
+<td><code>"milliseconds from the save request to the reply"</code></td>
+</tr>
+<tr>
+<td><code>op</code></td>
+<td>How you compare. One of <code>&lt;=</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&gt;</code>, <code>==</code>, <code>in</code>.</td>
+<td><code>"&lt;="</code></td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td>The target. Its type depends on <code>op</code>.</td>
+<td><code>200</code></td>
+</tr>
+</tbody>
+</table>
+<p>You can add <code>unit</code>, for example <code>unit = "ms"</code>.
+The <code>origin</code> of a criterion is <code>user</code>, <code>proposed</code>, or <code>source</code>.
+Use <code>proposed</code> when the target is your own suggestion.</p>
+<p>For <code>in</code>, the value is a list of allowed values, or a range such as <code>{ min = 1, max = 10 }</code>.
+The list <code>[1, 10]</code> means only 1 or 10, not the numbers between them.</p>
+<p>If you do not know the number yet, write a <code>statement</code> with the condition in words.
+The tool then gives an <code>incomplete_criterion</code> warning under the <code>source</code> profile.
+Do not invent a number only to remove the warning.
+A warning that tells the truth is better than a false target.</p>
+<h3 id="worked-example">Worked example</h3>
+<p>Change the <code>save_note</code> block in <code>notes.ad.hcl</code> to this:</p>
+<div class="code"><pre><span></span><code><span class="err">fr</span><span class="w"> </span><span class="s2">&quot;save_note&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">need</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">need.keep_ideas</span><span class="p">]</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Save a new note.&quot;</span>
+<span class="w">  </span><span class="err">criterion</span><span class="w"> </span><span class="s2">&quot;save_time&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">metric</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;milliseconds from the save request to the reply&quot;</span>
+<span class="w">    </span><span class="na">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&lt;=&quot;</span>
+<span class="w">    </span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">200</span>
+<span class="w">    </span><span class="na">unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ms&quot;</span>
+<span class="w">    </span><span class="na">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;proposed&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3 id="your-turn">Your turn</h3>
+<p>Write a criterion <code>complete_results</code> for <code>find_notes</code>.
+The target: every saved note that contains the search word appears in the result.
+Write it yourself first. Then compare with the answer.</p>
+<details>
+<summary>One possible answer</summary>
+<div class="code"><pre><span></span><code><span class="err">fr</span><span class="w"> </span><span class="s2">&quot;find_notes&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">need</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">need.keep_ideas</span><span class="p">]</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Return the notes that contain a search word.&quot;</span>
+<span class="w">  </span><span class="err">criterion</span><span class="w"> </span><span class="s2">&quot;complete_results&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">metric</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;share of saved notes that contain the word and appear in the result&quot;</span>
+<span class="w">    </span><span class="na">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;==&quot;</span>
+<span class="w">    </span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>
+<span class="w">    </span><span class="na">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;proposed&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Your metric text can be different. The important parts are a measurable metric, an operator, and a value. Use this version for the rest of the guide, so that your reports match the guide.</p>
+</details>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-4-acceptance-criteria" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-5-design-parameters" class="doc-section" data-lesson="lesson-5-design-parameters"><h2 id="lesson-5-design-parameters">Lesson 5: Design parameters</h2>
+<p>A <code>dp</code> block names the part of the design that controls an FR.
+It has three required fields:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>controls</code></td>
+<td>A list of the FRs that this DP is meant to control.</td>
+</tr>
+<tr>
+<td><code>responsibility</code></td>
+<td>What this part does, in words.</td>
+</tr>
+<tr>
+<td><code>decision</code></td>
+<td>The state of the choice: <code>proposed</code>, <code>selected</code>, <code>rejected</code>, or <code>superseded</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Only DPs with <code>decision = "selected"</code> are part of the design that the tool assesses by default.
+A <code>proposed</code> or <code>rejected</code> DP stays in the file as a record of an option.
+So the file keeps the history of your choices.</p>
+<p>The <code>decision</code> field is a design decision.
+It does not say that the code exists.
+The tool finds the implementation status from other facts, not from this field.</p>
+<h3 id="add-the-dps">Add the DPs</h3>
+<p>Add these blocks to the end of <code>notes.ad.hcl</code>:</p>
+<div class="code"><pre><span></span><code><span class="err">dp</span><span class="w"> </span><span class="s2">&quot;note_store&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">controls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.save_note</span><span class="p">]</span>
+<span class="w">  </span><span class="na">responsibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Write each note as one row in a local table and reply after the write.&quot;</span>
+<span class="w">  </span><span class="na">decision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;selected&quot;</span>
+<span class="p">}</span>
+
+<span class="err">dp</span><span class="w"> </span><span class="s2">&quot;word_index&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">controls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.find_notes</span><span class="p">]</span>
+<span class="w">  </span><span class="na">responsibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Keep a map from each word to the notes that contain it.&quot;</span>
+<span class="w">  </span><span class="na">decision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;selected&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>A <code>controls</code> link is a proposed pairing.
+It does not prove that the DP really changes the FR.
+For that, you write an influence.</p>
+<h3 id="add-the-diagonal-influences">Add the diagonal influences</h3>
+<p>An <code>influence</code> block states the effect of one or more DPs on one FR.
+It has no label.
+Add these two blocks:</p>
+<div class="code"><pre><span></span><code><span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.note_store</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.save_note</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The write path sets how long a save takes.&quot;</span>
+<span class="p">}</span>
+
+<span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.word_index</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.find_notes</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The index decides which notes a search returns.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>These two influences fill the diagonal of the matrix.</p>
+<h3 id="predict-then-run_1">Predict, then run</h3>
+<p>The model now has two FRs, two DPs, and the two diagonal effects.
+Write down your answer: is the design uncoupled?
+Then run <code>adhcl validate notes.ad.hcl</code>.</p>
+<p>These are the first findings and the scope part of the report:</p>
+<div class="code"><pre><span></span><code>Findings
+- warning unresolved_influence on design.notes: Scope design.notes has influence cells that are not fully known, so its classification is unresolved.
+- warning unresolved_influence on master: Scope master has influence cells that are not fully known, so its classification is unresolved.
+...
+Scopes
+- Scope design.notes: unresolved.
+  Support: unresolved (structural classification alone is not support).
+  Pairing: fr.find_notes with dp.word_index, fr.save_note with dp.note_store
+  Order: none
+</code></pre></div>
+
+<p>The errors are gone, so the exit code is 0.
+But the classification is <code>unresolved</code>, not <code>uncoupled</code>.
+The two off-diagonal cells are unknown, because you did not write them:</p>
+<div class="code"><pre><span></span><code>             note_store   word_index
+save_note        X            ?
+find_notes       ?            X
+</code></pre></div>
+
+<p>A diagonal that you wrote is not a diagonal matrix.
+The tool does not guess zeros.
+You must state the other cells too.</p>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-5-design-parameters" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-6-influences-in-detail" class="doc-section" data-lesson="lesson-6-influences-in-detail"><h2 id="lesson-6-influences-in-detail">Lesson 6: Influences in detail</h2>
+<p>Every influence has an <code>effect</code>.
+Each effect value has its own rule:</p>
+<table>
+<thead>
+<tr>
+<th><code>effect</code></th>
+<th>Matrix cell</th>
+<th>Required field</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>material</code></td>
+<td><code>X</code></td>
+<td><code>mechanism</code>: how the DP changes the FR.</td>
+</tr>
+<tr>
+<td><code>none</code></td>
+<td><code>0</code></td>
+<td><code>because</code>: why the DP cannot change the FR.</td>
+</tr>
+<tr>
+<td><code>unknown</code></td>
+<td><code>?</code></td>
+<td>No extra field. Use it to record an open question.</td>
+</tr>
+</tbody>
+</table>
+<p>A material effect means that a change to the DP can make the FR fail its criterion.
+A function call alone is not a material effect.
+Ask this question: if I change this DP, can this FR miss its target?</p>
+<p>If you add a mechanism that no source states, add <code>mechanism_source = "inferred"</code>.
+This marks the mechanism as your own reasoning.</p>
+<h3 id="fill-in-the-matrix">Fill in the matrix</h3>
+<p>Think about the notes app.
+The index reads the words from the stored rows.
+The save sends its reply before the index updates.</p>
+<p>Before you read on, write the two missing cells as <code>X</code> or <code>0</code>, with one reason for each.</p>
+<details>
+<summary>Answer</summary>
+<p><code>note_store</code> to <code>find_notes</code> is <code>X</code>. The index reads the stored rows, so a change to the row format changes what the index sees.</p>
+<p><code>word_index</code> to <code>save_note</code> is <code>0</code>. The save replies before the index updates, so the index cannot change the save time.</p>
+</details>
+<p>Add the two influences to <code>notes.ad.hcl</code>:</p>
+<div class="code"><pre><span></span><code><span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.note_store</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.find_notes</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The index reads words from the stored rows. A change to the row format changes which words the index sees.&quot;</span>
+<span class="p">}</span>
+
+<span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.word_index</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.save_note</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;none&quot;</span>
+<span class="w">  </span><span class="na">because</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The index updates after the save reply is sent, so it cannot change the save time.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The matrix is now complete:</p>
+<div class="code"><pre><span></span><code>             note_store   word_index
+save_note        X            0
+find_notes       X            X
+</code></pre></div>
+
+<h3 id="predict-then-run_2">Predict, then run</h3>
+<p>Write down the classification and the design order that you expect.
+Then run the tool. The scope part of the report is this:</p>
+<div class="code"><pre><span></span><code>Scopes
+- Scope design.notes: decoupled.
+  Support: unresolved (structural classification alone is not support).
+  Pairing: fr.find_notes with dp.word_index, fr.save_note with dp.note_store
+  Order: dp.note_store, dp.word_index
+</code></pre></div>
+
+<p>The design is decoupled.
+Decide <code>note_store</code> first, because it affects both FRs.
+Then tune <code>word_index</code> to make <code>find_notes</code> meet its target.
+If you change the row format later, you must test <code>find_notes</code> again.</p>
+<h3 id="a-default-for-the-other-cells">A default for the other cells</h3>
+<p>A large matrix has many zero cells.
+A <code>cells</code> block gives one default for all unlisted cells in one scope:</p>
+<div class="code"><pre><span></span><code><span class="err">cells</span><span class="w"> </span><span class="s2">&quot;top_level&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">design.notes</span>
+<span class="w">  </span><span class="na">unlisted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;none&quot;</span>
+<span class="w">  </span><span class="na">because</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The index updates after the save reply is sent. No other pair has an effect.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>unlisted</code> is <code>none</code> or <code>unknown</code>.
+A <code>none</code> default needs a <code>because</code>.
+The default also fills diagonal cells that have no influence block.
+So always write each diagonal influence first, or the tool reports that a DP has no effect on its own FR.</p>
+<h3 id="two-facts-that-disagree">Two facts that disagree</h3>
+<p>The tool keeps every influence that you write.
+It does not let a later block replace an earlier one.
+If one block says <code>material</code> and another says <code>none</code> for the same DP and FR, the tool reports <code>conflicting_influence</code> as an error.
+Remove one of the two claims, or limit each claim to a different context with <code>under</code>.</p>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-6-influences-in-detail" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-7-read-the-whole-report" class="doc-section" data-lesson="lesson-7-read-the-whole-report"><h2 id="lesson-7-read-the-whole-report">Lesson 7: Read the whole report</h2>
+<p>Run <code>adhcl validate notes.ad.hcl</code> again and read the full report.
+It has five parts in this order:</p>
+<ol>
+<li>The header: the input, tool version, contract, profile, candidate, context, and workload.</li>
+<li>Findings: each error and warning.</li>
+<li>Scopes: the classification, pairing, order, and cycles of each sibling set and of the master matrix.</li>
+<li>Owners: the results of attachments. A file without a manifest has none.</li>
+<li>Summary: the counts, the status of each stage, and the open causes.</li>
+</ol>
+<p>Your report now has <code>support_gap</code> warnings, one for each influence.
+For example:</p>
+<div class="code"><pre><span></span><code>- warning support_gap on notes.ad.hcl:45-50 at notes.ad.hcl:45:1: The claimed influence from dp.note_store to fr.save_note has no reviewed support.
+</code></pre></div>
+
+<p>An influence is a claim.
+The tool accepts the claim for the structure, but it says that nobody reviewed it.
+That is why each scope says <code>Support: unresolved</code>.
+The <code>support_gap</code> warning stays a warning in both profiles.</p>
+<p>The last line of the report is the most important line:</p>
+<div class="code"><pre><span></span><code>Exit code 0 means that validation completed under the profile, not that the design is independent or implemented.
+</code></pre></div>
+
+<p>Exit code 0 means that the model is well formed and has no error findings.
+It does not prove that the design is good, that the claims are true, or that code exists.</p>
+<h3 id="test-yourself_2">Test yourself</h3>
+<ol>
+<li>Which effect value needs <code>because</code>, and which needs <code>mechanism</code>?</li>
+<li>You have the diagonal and nothing else. Why is the design not uncoupled?</li>
+<li>What does exit code 0 prove, and what does it not prove?</li>
+</ol>
+<details>
+<summary>Answers</summary>
+<ol>
+<li><code>none</code> needs <code>because</code>. <code>material</code> needs <code>mechanism</code>.</li>
+<li>The off-diagonal cells are unknown, not zero. The tool reports <code>unresolved</code> until you state them.</li>
+<li>It proves that the run found no error under the chosen profile. It does not prove independence, true claims, or an implementation.</li>
+</ol>
+</details>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-7-read-the-whole-report" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-8-learn-from-errors" class="doc-section" data-lesson="lesson-8-learn-from-errors"><h2 id="lesson-8-learn-from-errors">Lesson 8: Learn from errors</h2>
+<p>Experts read error messages fast because they saw many of them.
+In this lesson you make errors on purpose.
+For each change, start from your working <code>notes.ad.hcl</code>.
+Make the change, predict the code, then run the tool.
+Undo the change before the next one.</p>
+<table>
+<thead>
+<tr>
+<th>No.</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>In <code>dp "note_store"</code>, write <code>controls = ["fr.save_note"]</code>.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>In the <code>none</code> influence, delete the <code>because</code> line.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>In the influence to <code>find_notes</code> from <code>word_index</code>, delete the <code>mechanism</code> line.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Rename <code>fr "find_notes"</code> to <code>fr "FindNotes"</code>.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>In the <code>none</code> influence, write <code>from = [dp.wordindex]</code>.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>In the criterion <code>save_time</code>, write <code>value = 100 + 100</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Write your six predictions down. Then open the answers.</p>
+<details>
+<summary>Answers from real runs</summary>
+<ol>
+<li><code>invalid_structure</code>: "controls each item must be a reference such as kind.label".</li>
+<li><code>invalid_structure</code>: "a none influence needs a because reason".</li>
+<li><code>invalid_structure</code>: "a material influence needs a mechanism".</li>
+<li><code>invalid_structure</code>: "the label must use lower case letters, digits, and single underscores, and start with a letter".</li>
+<li><code>invalid_reference</code>: "dp.wordindex does not name a declared block. This field needs a dp."</li>
+<li><code>invalid_syntax</code>: "This expression form is not allowed." The tool also reports <code>invalid_structure</code>, because the value is not a number.</li>
+</ol>
+<p>Each error stops the run with exit code 1. The tool does not guess a fix. It does not turn a wrong reference into a string, and it does not compute the sum.</p>
+</details>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-8-learn-from-errors" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-9-coupled-designs" class="doc-section" data-lesson="lesson-9-coupled-designs"><h2 id="lesson-9-coupled-designs">Lesson 9: Coupled designs</h2>
+<p>Now change one design choice.
+Suppose that the save waits for the index update before it replies.
+Then a slow index makes a slow save.</p>
+<p>Replace the <code>none</code> influence with this block:</p>
+<div class="code"><pre><span></span><code><span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.word_index</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.save_note</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The save waits for the index update before it replies, so a slow index makes a slow save.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Draw the matrix and predict the classification before you run the tool.</p>
+<details>
+<summary>Answer</summary>
+<div class="code"><pre><span></span><code>             note_store   word_index
+save_note        X            X
+find_notes       X            X
+</code></pre></div>
+
+<p>No order of the DPs gives a triangle, so the design is coupled.</p>
+</details>
+<p>The report shows the cycle:</p>
+<div class="code"><pre><span></span><code>- Scope design.notes: coupled.
+  Support: unresolved (structural classification alone is not support).
+  Pairing: fr.find_notes with dp.word_index, fr.save_note with dp.note_store
+  Order: none
+  Cycle: dp.note_store, dp.word_index
+</code></pre></div>
+
+<p>It also gives this warning:</p>
+<div class="code"><pre><span></span><code>- warning incomplete_feedback_contract on design.notes at notes.ad.hcl:33:1: Scope design.notes has a feedback cycle without a complete coupling record, so its iteration bound, convergence, stopping rule, or failure behavior is missing.
+</code></pre></div>
+
+<p>A coupled design is valid input.
+The tool does not call it an error.
+But it asks you how the loop ends.</p>
+<h3 id="two-ways-forward">Two ways forward</h3>
+<p>The better way is to change the design.
+Go back to the version where the index updates after the reply.
+That removes the <code>X</code> and makes the design decoupled again.</p>
+<p>If you must keep the coupling, record it with a <code>coupling</code> block:</p>
+<div class="code"><pre><span></span><code><span class="err">coupling</span><span class="w"> </span><span class="s2">&quot;save_waits_for_index&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">design.notes</span>
+<span class="w">  </span><span class="na">affects</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.note_store</span><span class="p">,</span><span class="w"> </span><span class="nv">dp.word_index</span><span class="p">,</span><span class="w"> </span><span class="nv">fr.save_note</span><span class="p">,</span><span class="w"> </span><span class="nv">fr.find_notes</span><span class="p">]</span>
+<span class="w">  </span><span class="na">reason</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The save waits for the index update, and the index reads the saved rows.&quot;</span>
+<span class="w">  </span><span class="na">iteration_bound</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span>
+<span class="w">  </span><span class="na">convergence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Each pass indexes only the rows that changed, so the work gets smaller.&quot;</span>
+<span class="w">  </span><span class="na">stopping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Stop when a pass finds no changed rows.&quot;</span>
+<span class="w">  </span><span class="na">failure_behavior</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;After three passes, reply to the save and mark the index as stale.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The <code>affects</code> list must contain every DP in the cycle and the FR of each of those DPs.
+With this block, the <code>incomplete_feedback_contract</code> warning goes away.
+The design stays coupled.
+A coupling record explains the coupling, but it does not remove it.</p>
+<p>Before you continue, go back to the decoupled version.
+Restore the <code>none</code> influence and delete the <code>coupling</code> block.</p>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-9-coupled-designs" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-10-tests-with-expect" class="doc-section" data-lesson="lesson-10-tests-with-expect"><h2 id="lesson-10-tests-with-expect">Lesson 10: Tests with expect</h2>
+<p>An <code>expect</code> block is a test for the matrix.
+You state the classification and the design order that you expect.
+The tool fails the run if the result is different.</p>
+<p>Add this block to <code>notes.ad.hcl</code>:</p>
+<div class="code"><pre><span></span><code><span class="err">expect</span><span class="w"> </span><span class="s2">&quot;top_level_order&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">design.notes</span>
+<span class="w">  </span><span class="na">classification</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;decoupled&quot;</span>
+<span class="w">  </span><span class="na">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.note_store</span><span class="p">,</span><span class="w"> </span><span class="nv">dp.word_index</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The run passes, because the result is decoupled with that order.
+An <code>expect</code> block is a test, not a fact.
+It never fills in a missing cell.</p>
+<h3 id="make-the-test-fail">Make the test fail</h3>
+<p>Try two changes, one at a time, and predict the message each time.</p>
+<ol>
+<li>Change the classification to <code>"uncoupled"</code>.</li>
+<li>Change the order to <code>[dp.word_index, dp.note_store]</code>.</li>
+</ol>
+<details>
+<summary>Answers from real runs</summary>
+<ol>
+<li><code>failed_expectation</code>: "Expectation expect.top_level_order does not hold: scope design.notes is decoupled, not uncoupled."</li>
+<li><code>failed_expectation</code>: "Expectation expect.top_level_order does not hold: its order places dp.word_index before dp.note_store, but dp.note_store must come first because it materially affects fr.find_notes."</li>
+</ol>
+</details>
+<p>Undo both changes before you continue.
+Keep <code>expect</code> blocks in your model.
+When somebody adds an influence later, the test shows if the structure changed.</p>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-10-tests-with-expect" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-11-break-an-fr-down" class="doc-section" data-lesson="lesson-11-break-an-fr-down"><h2 id="lesson-11-break-an-fr-down">Lesson 11: Break an FR down</h2>
+<p>A large FR needs more detail.
+Axiomatic Design adds detail by zigzagging.
+You choose a DP, then you ask which smaller FRs that DP must meet.
+Those child FRs live inside the DP.</p>
+<p>A child FR uses <code>parent = dp.x</code> in place of <code>need</code>.
+The DP that controls a child FR has no parent field.
+The tool finds its place from the FRs in its <code>controls</code> list.</p>
+<p>In this lesson, you break <code>dp.word_index</code> into two parts: split the text into words, and look up a word.</p>
+<h3 id="add-the-children">Add the children</h3>
+<p>Add this text to <code>notes.ad.hcl</code>:</p>
+<div class="code"><pre><span></span><code><span class="err">fr</span><span class="w"> </span><span class="s2">&quot;split_words&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dp.word_index</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Split the text of a note into words.&quot;</span>
+<span class="p">}</span>
+
+<span class="err">fr</span><span class="w"> </span><span class="s2">&quot;look_up_word&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dp.word_index</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Return the notes for one word.&quot;</span>
+<span class="p">}</span>
+
+<span class="err">dp</span><span class="w"> </span><span class="s2">&quot;word_splitter&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">controls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.split_words</span><span class="p">]</span>
+<span class="w">  </span><span class="na">responsibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Split text at spaces and punctuation and make each word lower case.&quot;</span>
+<span class="w">  </span><span class="na">decision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;selected&quot;</span>
+<span class="p">}</span>
+
+<span class="err">dp</span><span class="w"> </span><span class="s2">&quot;word_map&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">controls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.look_up_word</span><span class="p">]</span>
+<span class="w">  </span><span class="na">responsibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Keep a hash map from each word to a list of note IDs.&quot;</span>
+<span class="w">  </span><span class="na">decision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;selected&quot;</span>
+<span class="p">}</span>
+
+<span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.word_splitter</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.look_up_word</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The map keys are the words that the splitter makes. A different split gives different keys.&quot;</span>
+<span class="p">}</span>
+
+<span class="err">cells</span><span class="w"> </span><span class="s2">&quot;index_parts&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dp.word_index</span>
+<span class="w">  </span><span class="na">unlisted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;none&quot;</span>
+<span class="w">  </span><span class="na">because</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The map does not change how text is split.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The new scope <code>dp.word_index</code> holds the two child FRs and their DPs.
+It has its own matrix.</p>
+<h3 id="predict-then-run_3">Predict, then run</h3>
+<p>Something is missing.
+Look at the <code>cells</code> block and the influences, and find the problem before you run the tool.</p>
+<details>
+<summary>Answer</summary>
+<p>The diagonal influences are missing. The <code>cells</code> default sets every unlisted cell to <code>none</code>, and that includes the diagonal. The tool reports <code>ineffective_control</code> for both child DPs, once in the scope <code>dp.word_index</code> and once in the <code>master</code> scope:</p>
+<div class="code"><pre><span></span><code>- error ineffective_control on dp.word_index: Design parameter dp.word_splitter has no material effect on its paired requirement fr.split_words in scope dp.word_index.
+- error ineffective_control on dp.word_index: Design parameter dp.word_map has no material effect on its paired requirement fr.look_up_word in scope dp.word_index.
+</code></pre></div>
+
+</details>
+<p>Add the two diagonal influences:</p>
+<div class="code"><pre><span></span><code><span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.word_splitter</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.split_words</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The split rule decides which words come out of a text.&quot;</span>
+<span class="p">}</span>
+
+<span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.word_map</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.look_up_word</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The map decides which note IDs a word returns.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Now the scope <code>dp.word_index</code> is decoupled with the order <code>dp.word_splitter, dp.word_map</code>.
+But the <code>master</code> scope is still <code>unresolved</code>.</p>
+<h3 id="the-master-matrix-crosses-branches">The master matrix crosses branches</h3>
+<p>The master matrix has the leaf FRs as rows and the leaf DPs as columns.
+Here the leaves are <code>save_note</code>, <code>split_words</code>, and <code>look_up_word</code>.
+The <code>cells</code> block covers only one sibling set.
+It does not cover cells between <code>note_store</code> and the new children.</p>
+<p>Effects between branches are real.
+Shared state, shared resources, and failures can join two branches.
+So the tool asks you to state them.
+Add these influences:</p>
+<div class="code"><pre><span></span><code><span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.note_store</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.split_words</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The splitter reads the text from the stored rows. A change to the row format changes the text it gets.&quot;</span>
+<span class="p">}</span>
+
+<span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.note_store</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.look_up_word</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;none&quot;</span>
+<span class="w">  </span><span class="na">because</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The map holds only words and note IDs that the splitter gives it.&quot;</span>
+<span class="p">}</span>
+
+<span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.word_splitter</span><span class="p">,</span><span class="w"> </span><span class="nv">dp.word_map</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.save_note</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;none&quot;</span>
+<span class="w">  </span><span class="na">because</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The index parts run after the save reply is sent.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The last block has two DPs in <code>from</code>.
+The tool reads it as two separate claims with the same reason.</p>
+<p>Run the tool again. The master scope is now decoupled:</p>
+<div class="code"><pre><span></span><code>- Scope master: decoupled.
+  Support: unresolved (structural classification alone is not support).
+  Pairing: fr.look_up_word with dp.word_map, fr.save_note with dp.note_store, fr.split_words with dp.word_splitter
+  Order: dp.note_store, dp.word_splitter, dp.word_map
+</code></pre></div>
+
+<p>Two <code>unresolved_refinement</code> warnings stay.
+The material effects on the parent <code>find_notes</code> describe the parent outcome as a whole.
+The tool does not copy a parent <code>X</code> down to the children.
+Each parent effect is an open question about which child cells carry it.
+The warning reminds you of that question.</p>
+<p>Put each influence that crosses branches in the file of the nearest common parent.
+You learn about files in Lesson 14.</p>
+<p>The rest of this guide uses the one-level model from Lesson 10.
+Save this version as <code>notes-zigzag.ad.hcl</code>, and restore <code>notes.ad.hcl</code> to the Lesson 10 state.</p>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-11-break-an-fr-down" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-12-from-design-to-code" class="doc-section" data-lesson="lesson-12-from-design-to-code"><h2 id="lesson-12-from-design-to-code">Lesson 12: From design to code</h2>
+<p>So far, the model says what the design does.
+Now you connect the design to the code with modules and scenarios.
+The <code>architecture</code> profile requires these links.</p>
+<h3 id="predict-then-run_4">Predict, then run</h3>
+<p>Run the tool with the stricter profile:</p>
+<div class="code"><pre><span></span><code>adhcl<span class="w"> </span>validate<span class="w"> </span>--profile<span class="w"> </span>architecture<span class="w"> </span>notes.ad.hcl
+</code></pre></div>
+
+<p>Before you run it, predict which warning codes from Lesson 3 now become errors.</p>
+<details>
+<summary>Answer</summary>
+<p><code>missing_leaf_scenario</code> and <code>incomplete_module_contract</code> become errors. The <code>architecture</code> profile makes eight gap codes into errors, for example <code>incomplete_criterion</code> and <code>unresolved_influence</code>. The <code>support_gap</code> code stays a warning in both profiles.</p>
+</details>
+<h3 id="modules">Modules</h3>
+<p>A <code>module</code> block is a logical boundary in the code.
+A realization module uses <code>realizes</code> to name its DPs.
+The architecture profile needs a full contract for each module:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inputs</code>, <code>outputs</code></td>
+<td>Lists of strings that describe the data in and out.</td>
+</tr>
+<tr>
+<td><code>owns_state</code></td>
+<td>References to <code>state</code> blocks that this module owns. Write <code>[]</code> when it owns none.</td>
+</tr>
+<tr>
+<td><code>dependencies</code></td>
+<td>References to other modules. Write <code>[]</code> when there are none.</td>
+</tr>
+<tr>
+<td><code>invariants</code></td>
+<td>Facts that are always true for this module.</td>
+</tr>
+<tr>
+<td><code>failure_behavior</code></td>
+<td>What the module does when something fails.</td>
+</tr>
+<tr>
+<td><code>acceptance_checks</code></td>
+<td>References to criteria or scenarios. Never prose.</td>
+</tr>
+</tbody>
+</table>
+<p>An empty list is a statement: "this module has none".
+A missing field means "not stated".
+The architecture profile needs the statement.</p>
+<h3 id="scenarios">Scenarios</h3>
+<p>A <code>scenario</code> block describes a test case.
+Its <code>kind</code> is <code>operational</code>, <code>change</code>, or <code>failure</code>.
+<code>verifies</code> lists the criteria that the scenario tests.
+<code>steps</code> is a list of instructions in words.</p>
+<p>A scenario is a plan for a test.
+It does not say that the test ran or passed.</p>
+<h3 id="add-the-modules-and-scenarios">Add the modules and scenarios</h3>
+<p>Add these blocks to <code>notes.ad.hcl</code>:</p>
+<div class="code"><pre><span></span><code><span class="kr">module</span><span class="w"> </span><span class="nv">&quot;store&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">realizes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.note_store</span><span class="p">]</span>
+<span class="w">  </span><span class="na">inputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;The text of one new note.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">outputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;The ID of the saved note.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">owns_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">  </span><span class="na">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">  </span><span class="na">invariants</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;A saved note is never changed by a search.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">failure_behavior</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;If the write fails, reply with an error and save nothing.&quot;</span>
+<span class="w">  </span><span class="na">acceptance_checks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.save_note.criterion.save_time</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="kr">module</span><span class="w"> </span><span class="nv">&quot;index&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">realizes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.word_index</span><span class="p">]</span>
+<span class="w">  </span><span class="na">inputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;The saved rows.&quot;, &quot;One search word.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">outputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;The IDs of the notes that contain the word.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">owns_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">  </span><span class="na">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">module.store</span><span class="p">]</span>
+<span class="w">  </span><span class="na">invariants</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;The index never writes to the note table.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">failure_behavior</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;If the index is not ready, reply with an error and not with an empty list.&quot;</span>
+<span class="w">  </span><span class="na">acceptance_checks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.find_notes.criterion.complete_results</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="err">scenario</span><span class="w"> </span><span class="s2">&quot;save_is_fast&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">kind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;operational&quot;</span>
+<span class="w">  </span><span class="na">verifies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.save_note.criterion.save_time</span><span class="p">]</span>
+<span class="w">  </span><span class="na">steps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Save 1000 notes of 1 to 500 words.&quot;, &quot;Measure the time from each request to its reply.&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="err">scenario</span><span class="w"> </span><span class="s2">&quot;search_finds_all&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">kind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;operational&quot;</span>
+<span class="w">  </span><span class="na">verifies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.find_notes.criterion.complete_results</span><span class="p">]</span>
+<span class="w">  </span><span class="na">steps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Save 100 notes with known words.&quot;, &quot;Search for each word.&quot;, &quot;Compare each result with the expected list.&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Run the architecture profile again.
+The result is <code>Errors: 0</code> and four <code>support_gap</code> warnings, one for each influence.
+The model is now complete for this profile.</p>
+<h3 id="process-variables-and-flows">Process variables and flows</h3>
+<p>Two more blocks connect the design to real things.
+A <code>pv</code> block names the code, package, or resource that realizes a DP:</p>
+<div class="code"><pre><span></span><code><span class="err">pv</span><span class="w"> </span><span class="s2">&quot;notes_table&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">realizes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.note_store</span><span class="p">]</span>
+<span class="w">  </span><span class="na">kind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;database table&quot;</span>
+<span class="w">  </span><span class="na">note</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The notes table in the local database.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>A <code>flow</code> block gives the runtime order of modules, for example <code>steps = [module.store, module.index]</code>.
+The runtime order is different from the design order.
+The design order tells you which decision to make first.
+The flow tells you which code runs first.</p>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-12-from-design-to-code" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-13-premises-and-contexts" class="doc-section" data-lesson="lesson-13-premises-and-contexts"><h2 id="lesson-13-premises-and-contexts">Lesson 13: Premises and contexts</h2>
+<p>Many claims are true only under a condition.
+The <code>0</code> between <code>word_index</code> and <code>save_note</code> is true only if the save replies before the index update.
+Write that condition as an <code>assumption</code>, and link it with <code>holds_if</code>:</p>
+<div class="code"><pre><span></span><code><span class="err">assumption</span><span class="w"> </span><span class="s2">&quot;index_after_reply&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The save path sends its reply before the index update starts.&quot;</span>
+<span class="w">  </span><span class="na">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;to_validate&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Then add <code>holds_if = [assumption.index_after_reply]</code> to the <code>none</code> influence.
+The <code>status</code> is <code>assumed</code>, <code>to_validate</code>, <code>validated</code>, or <code>invalidated</code>.</p>
+<p>The tool now reports a <code>support_gap</code> on the assumption too.
+A claim that depends on an open premise gives only a conditional result.
+If you set the status to <code>invalidated</code>, the claim loses its support.</p>
+<p>Three more blocks describe the operating conditions:</p>
+<table>
+<thead>
+<tr>
+<th>Block</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>workload</code></td>
+<td>The inputs and their ranges, for example <code>ranges = { note_words = { min = 1, max = 500 } }</code>.</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td>A named operating condition. It can list assumptions in <code>assumes</code>.</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>Information that a leaf DP owns (<code>owns_state</code>) or reads (<code>reads_state</code>).</td>
+</tr>
+</tbody>
+</table>
+<p>Use <code>under = context.x</code> on an influence or a criterion to make it apply only in that context.
+Two contexts that cannot happen together go in <code>excludes</code>.
+Then each context can have its own matrix without a conflict.</p>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-13-premises-and-contexts" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-14-split-the-model-and-add-attachments" class="doc-section" data-lesson="lesson-14-split-the-model-and-add-attachments"><h2 id="lesson-14-split-the-model-and-add-attachments">Lesson 14: Split the model and add attachments</h2>
+<p>A real model grows too large for one file.
+Split it by domain and by branch.
+Never put all FRs in one file and all DPs in another file.
+A child FR points to its parent DP, so one file holds one zigzag step.</p>
+<p>The recommended files are these:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>needs.ad.hcl</code></td>
+<td>Stakeholders, needs, and constraints.</td>
+</tr>
+<tr>
+<td><code>context.ad.hcl</code></td>
+<td>Assumptions, contexts, and workloads.</td>
+</tr>
+<tr>
+<td><code>design.ad.hcl</code></td>
+<td>The design root and the top-level FRs, DPs, influences, and decisions.</td>
+</tr>
+<tr>
+<td><code>design.BRANCH.ad.hcl</code></td>
+<td>One branch, for example <code>design.word_index.ad.hcl</code>.</td>
+</tr>
+<tr>
+<td><code>process.ad.hcl</code></td>
+<td>PVs, modules, flows, and scenarios.</td>
+</tr>
+</tbody>
+</table>
+<p>Never write a matrix file.
+The tool derives every matrix from the influences.</p>
+<h3 id="a-folder-as-input">A folder as input</h3>
+<p>Make a folder <code>notes/</code>.
+Put the design blocks in <code>notes/design.ad.hcl</code> and the modules and scenarios in <code>notes/process.ad.hcl</code>.
+Then run the tool on the folder:</p>
+<div class="code"><pre><span></span><code>adhcl<span class="w"> </span>validate<span class="w"> </span>--profile<span class="w"> </span>architecture<span class="w"> </span>notes
+</code></pre></div>
+
+<p>The tool reads every <code>*.ad.hcl</code> file directly in the folder and merges them.
+It does not read subfolders.
+The result is the same as for one file.</p>
+<h3 id="a-project-manifest-and-attachments">A project manifest and attachments</h3>
+<p>Some data belongs to other tools, for example a Terraform address or a page layout.
+That data does not go in the core files.
+It goes in an attachment file with the suffix <code>.ad.ext.hcl</code>.
+A manifest with the suffix <code>.ad.project.hcl</code> lists all the files and the extension owners.</p>
+<p>An extension owner is a built-in part of <code>adhcl</code> that reads one kind of attachment.
+There are three:</p>
+<table>
+<thead>
+<tr>
+<th>Owner label</th>
+<th>Role</th>
+<th>Subject</th>
+<th>Data fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>terraform_binding</code></td>
+<td><code>binding</code></td>
+<td>a <code>pv</code></td>
+<td><code>address</code>, <code>observation_source</code></td>
+</tr>
+<tr>
+<td><code>event_model_link</code></td>
+<td><code>behavior_link</code></td>
+<td>a <code>module</code></td>
+<td><code>model</code>, <code>revision</code>, <code>target_kind = "slice"</code>, <code>target_label</code></td>
+</tr>
+<tr>
+<td><code>html_view</code></td>
+<td><code>view</code></td>
+<td>the <code>design</code></td>
+<td><code>layout</code>, <code>show_source_locations = true</code></td>
+</tr>
+</tbody>
+</table>
+<p>Make <code>notes/model.ad.project.hcl</code>:</p>
+<div class="code"><pre><span></span><code><span class="err">project</span><span class="w"> </span><span class="s2">&quot;notes&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">language</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;requirements_hcl/core/1&quot;</span>
+<span class="w">  </span><span class="na">core_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;design.ad.hcl&quot;, &quot;process.ad.hcl&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">attachment_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;views.ad.ext.hcl&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="err">extension</span><span class="w"> </span><span class="s2">&quot;html_view&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">role</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;view&quot;</span>
+<span class="w">  </span><span class="na">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;requirements_hcl/html_view/1&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Make <code>notes/views.ad.ext.hcl</code>:</p>
+<div class="code"><pre><span></span><code><span class="err">attachment</span><span class="w"> </span><span class="s2">&quot;review_layout&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">owner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">extension.html_view</span>
+<span class="w">  </span><span class="na">subject</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">design.notes</span>
+<span class="w">  </span><span class="nb">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">layout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;requirements_first&quot;</span>
+<span class="w">    </span><span class="na">show_source_locations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Run the tool on the manifest:</p>
+<div class="code"><pre><span></span><code>adhcl<span class="w"> </span>validate<span class="w"> </span>--profile<span class="w"> </span>architecture<span class="w"> </span>notes/model.ad.project.hcl
+</code></pre></div>
+
+<p>The Owners part of the report now shows <code>review_layout on design.notes: valid.</code>
+Only a manifest loads attachments.
+A file or a folder input ignores them.</p>
+<p>An attachment cannot change a core fact.
+It cannot add a matrix cell or change a classification.
+The binding and behavior owners report <code>unknown</code> with a warning, because <code>adhcl</code> gets no observations and no behavior models.
+An <code>unknown</code> result never counts as success.</p>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-14-split-the-model-and-add-attachments" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-15-decisions-and-evidence" class="doc-section" data-lesson="lesson-15-decisions-and-evidence"><h2 id="lesson-15-decisions-and-evidence">Lesson 15: Decisions and evidence</h2>
+<p>A <code>decision</code> block compares candidate designs for the same FRs.
+Each <code>candidate</code> lists its DPs.
+Here is a decision with one candidate:</p>
+<div class="code"><pre><span></span><code><span class="err">decision</span><span class="w"> </span><span class="s2">&quot;note_search&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">addresses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.save_note</span><span class="p">,</span><span class="w"> </span><span class="nv">fr.find_notes</span><span class="p">]</span>
+<span class="w">  </span><span class="err">candidate</span><span class="w"> </span><span class="s2">&quot;word_map_index&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">dps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.note_store</span><span class="p">,</span><span class="w"> </span><span class="nv">dp.word_index</span><span class="p">]</span>
+<span class="w">    </span><span class="na">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;notes-proposal-1&quot;</span>
+<span class="w">    </span><span class="nb">information</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="na">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;unknown&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="na">selected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;word_map_index&quot;</span>
+<span class="w">  </span><span class="na">provisional</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
+<span class="w">  </span><span class="na">why</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;A word map is simple. No test results exist yet.&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The tool reports <code>unresolved_feasibility</code> as a warning.
+No evidence shows that this candidate meets the criteria.</p>
+<p>The Information Axiom picks the design with the highest chance of success.
+Information content is <code>I = -log2(p)</code>, where <code>p</code> is the chance that all FRs succeed together.
+The language has strict rules for <code>p</code>:</p>
+<ol>
+<li>You cannot type a probability. It comes only from an <code>evidence</code> block with measured trials.</li>
+<li>The evidence names the candidate version, context, workload, time horizon, and a scenario that covers every criterion.</li>
+<li>Each trial measures all FRs together. You cannot multiply separate success rates.</li>
+<li>Zero failures do not prove <code>p = 1</code>. The tool gives an interval, not a certainty.</li>
+<li>Without such evidence, the information content stays unknown and the decision stays provisional.</li>
+</ol>
+<p>These rules stop a model from showing numbers that nobody measured.</p>
+
+<p class="done-row"><button type="button" class="btn-done" data-done="lesson-15-decisions-and-evidence" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-mixed-review" class="doc-section"><h2 id="mixed-review">Mixed review</h2>
+<p>These questions mix all the lessons.
+The mix is on purpose: in real work, you must first decide which idea a problem needs.
+Answer all of them before you open the answers.</p>
+<ol>
+<li>A teammate writes <code>effect = "none"</code> with no other field. What does the tool report?</li>
+<li>Which block makes every unlisted cell in one sibling set a zero?</li>
+<li>You run a folder that contains <code>model.ad.project.hcl</code>. Does the tool read the attachments?</li>
+<li>Which field of a module can contain only references, never prose?</li>
+<li>A matrix has <code>X</code> in (FR1, DP1), (FR2, DP2), (FR2, DP1), and (FR1, DP2). Which classification, and which block can record it?</li>
+<li>What is the reference to the criterion <code>uptime</code> inside <code>fr "serve_api"</code>?</li>
+<li>Under the <code>source</code> profile, a leaf FR has no scenario. Error or warning? And under <code>architecture</code>?</li>
+<li>A test ran 500 times with zero failures. Can you claim <code>p = 1</code>?</li>
+<li>Where does a Terraform resource address belong?</li>
+<li>You add <code>parent = dp.x</code> to an FR. Which scope does the FR now belong to?</li>
+</ol>
+<details>
+<summary>Answers</summary>
+<ol>
+<li>An <code>invalid_structure</code> error: a none influence needs a because reason.</li>
+<li>A <code>cells</code> block with <code>unlisted = "none"</code> and a <code>because</code>.</li>
+<li>No. A folder input reads only the <code>*.ad.hcl</code> files. Give the manifest path to load attachments.</li>
+<li><code>acceptance_checks</code>. It takes criterion or scenario references.</li>
+<li>Coupled. A <code>coupling</code> block records it, with the DPs and FRs in <code>affects</code>.</li>
+<li><code>fr.serve_api.criterion.uptime</code>.</li>
+<li>A warning (<code>missing_leaf_scenario</code>) under <code>source</code>, an error under <code>architecture</code>.</li>
+<li>No. Zero failures never establish <code>p = 1</code>. The evidence gives an interval.</li>
+<li>In a <code>terraform_binding</code> attachment on a <code>pv</code>, in a <code>.ad.ext.hcl</code> file. Do not repeat it in the core <code>pv</code> block.</li>
+<li>The scope <code>dp.x</code>, the sibling set of the children of that DP.</li>
+</ol>
+</details>
+
+</section><section id="sec-final-exercise-a-link-shortener" class="doc-section"><h2 id="final-exercise-a-link-shortener">Final exercise: a link shortener</h2>
+<p>Now design a model alone.
+Do not look at the notes model while you write.
+Look back only when you are stuck.</p>
+<p>A link shortener has two outcomes:</p>
+<ol>
+<li>It returns a new short code for a long web address. A code never points to two addresses.</li>
+<li>It sends a visitor from a short code to its address within 50 milliseconds.</li>
+</ol>
+<p>The generator makes codes, and the redirect part looks them up.
+The redirect part never makes or changes a code.</p>
+<p>Your model is done when all of these are true:</p>
+<ol>
+<li><code>adhcl validate --profile architecture links.ad.hcl</code> reports <code>Errors: 0</code>.</li>
+<li>The only warnings are <code>support_gap</code>.</li>
+<li>An <code>expect</code> block states the classification and the design order.</li>
+<li>Each FR has an operational criterion and a scenario.</li>
+</ol>
+<p>Use the hints only when you are stuck, one at a time.</p>
+<details>
+<summary>Hint 1</summary>
+<p>Start with the design root, one need, and the two FRs with criteria. Run the tool. Fix the errors before you add more.</p>
+</details>
+<details>
+<summary>Hint 2</summary>
+<p>Fill all four cells. Ask for each cell: if I change this DP, can this FR miss its target? The redirect part depends on the code format.</p>
+</details>
+<details>
+<summary>Hint 3</summary>
+<p>The design is decoupled. The generator comes first in the design order.</p>
+</details>
+<details>
+<summary>One possible solution</summary>
+<div class="code"><pre><span></span><code><span class="err">design</span><span class="w"> </span><span class="s2">&quot;links&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">boundary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Make a short code for a long web address and send visitors from the code to the address. Accounts and click counts are outside the boundary.&quot;</span>
+<span class="p">}</span>
+
+<span class="err">need</span><span class="w"> </span><span class="s2">&quot;share_links&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Share a long web address as a short one.&quot;</span>
+<span class="w">  </span><span class="na">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;proposed&quot;</span>
+<span class="p">}</span>
+
+<span class="err">fr</span><span class="w"> </span><span class="s2">&quot;make_code&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">need</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">need.share_links</span><span class="p">]</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Return a new short code for a long address.&quot;</span>
+<span class="w">  </span><span class="err">criterion</span><span class="w"> </span><span class="s2">&quot;unique_code&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">metric</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;number of codes that point to two different addresses&quot;</span>
+<span class="w">    </span><span class="na">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;==&quot;</span>
+<span class="w">    </span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
+<span class="w">    </span><span class="na">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;proposed&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="err">fr</span><span class="w"> </span><span class="s2">&quot;redirect&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">need</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">need.share_links</span><span class="p">]</span>
+<span class="w">  </span><span class="na">statement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Send a visitor from a short code to its address.&quot;</span>
+<span class="w">  </span><span class="err">criterion</span><span class="w"> </span><span class="s2">&quot;redirect_time&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="na">metric</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;milliseconds from the request to the redirect reply&quot;</span>
+<span class="w">    </span><span class="na">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&lt;=&quot;</span>
+<span class="w">    </span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">50</span>
+<span class="w">    </span><span class="na">unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ms&quot;</span>
+<span class="w">    </span><span class="na">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;proposed&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="err">dp</span><span class="w"> </span><span class="s2">&quot;code_generator&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">controls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.make_code</span><span class="p">]</span>
+<span class="w">  </span><span class="na">responsibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Make a code from a counter that only goes up, and save the code with its address.&quot;</span>
+<span class="w">  </span><span class="na">decision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;selected&quot;</span>
+<span class="p">}</span>
+
+<span class="err">dp</span><span class="w"> </span><span class="s2">&quot;code_cache&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">controls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.redirect</span><span class="p">]</span>
+<span class="w">  </span><span class="na">responsibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Keep codes and addresses in memory and fall back to the saved table on a miss.&quot;</span>
+<span class="w">  </span><span class="na">decision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;selected&quot;</span>
+<span class="p">}</span>
+
+<span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.code_generator</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.make_code</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The counter gives each address a new code, so no code repeats.&quot;</span>
+<span class="p">}</span>
+
+<span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.code_cache</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.redirect</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;A hit in memory is fast and a miss reads the table, so the cache sets the reply time.&quot;</span>
+<span class="p">}</span>
+
+<span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.code_generator</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.redirect</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;material&quot;</span>
+<span class="w">  </span><span class="na">mechanism</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The cache looks up the codes that the generator makes. A change to the code format changes the lookup.&quot;</span>
+<span class="p">}</span>
+
+<span class="nb">influence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.code_cache</span><span class="p">]</span>
+<span class="w">  </span><span class="na">to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">fr.make_code</span>
+<span class="w">  </span><span class="na">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;none&quot;</span>
+<span class="w">  </span><span class="na">because</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;The cache only reads codes. It never makes or changes one.&quot;</span>
+<span class="p">}</span>
+
+<span class="err">expect</span><span class="w"> </span><span class="s2">&quot;top_level&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">design.links</span>
+<span class="w">  </span><span class="na">classification</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;decoupled&quot;</span>
+<span class="w">  </span><span class="na">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.code_generator</span><span class="p">,</span><span class="w"> </span><span class="nv">dp.code_cache</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="kr">module</span><span class="w"> </span><span class="nv">&quot;generator&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">realizes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.code_generator</span><span class="p">]</span>
+<span class="w">  </span><span class="na">inputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;One long web address.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">outputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;One new short code.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">owns_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">  </span><span class="na">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">  </span><span class="na">invariants</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;A saved code never changes its address.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">failure_behavior</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;If the save fails, reply with an error and give no code.&quot;</span>
+<span class="w">  </span><span class="na">acceptance_checks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.make_code.criterion.unique_code</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="kr">module</span><span class="w"> </span><span class="nv">&quot;redirector&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">realizes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">dp.code_cache</span><span class="p">]</span>
+<span class="w">  </span><span class="na">inputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;One short code.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">outputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;A redirect to the address, or a not found reply.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">owns_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">  </span><span class="na">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">module.generator</span><span class="p">]</span>
+<span class="w">  </span><span class="na">invariants</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;The redirector never writes to the code table.&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="na">failure_behavior</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;If the code is not known, reply with not found.&quot;</span>
+<span class="w">  </span><span class="na">acceptance_checks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.redirect.criterion.redirect_time</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="err">scenario</span><span class="w"> </span><span class="s2">&quot;no_repeated_codes&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">kind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;operational&quot;</span>
+<span class="w">  </span><span class="na">verifies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.make_code.criterion.unique_code</span><span class="p">]</span>
+<span class="w">  </span><span class="na">steps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Make codes for 10000 addresses.&quot;, &quot;Count the codes that point to two addresses.&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="err">scenario</span><span class="w"> </span><span class="s2">&quot;fast_redirect&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="na">kind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;operational&quot;</span>
+<span class="w">  </span><span class="na">verifies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">fr.redirect.criterion.redirect_time</span><span class="p">]</span>
+<span class="w">  </span><span class="na">steps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Request 1000 known codes.&quot;, &quot;Measure the time from each request to its reply.&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Your text can be different. Compare the structure: four influences, one <code>expect</code>, one module for each DP, and one scenario for each criterion.</p>
+</details>
+<p>To go further, make the design coupled on purpose.
+For example, let the generator read the cache to skip codes that are in use.
+Predict the new matrix, run the tool, and then add a <code>coupling</code> block.</p>
+
+</section><section id="sec-review-plan" class="doc-section"><h2 id="review-plan">Review plan</h2>
+<p>You forget most new material within a few days unless you practice recall.
+Use this plan after you finish the guide:</p>
+<ol>
+<li>After one day: answer the Mixed review again without notes. Then write the notes model from memory, up to Lesson 6.</li>
+<li>After three days: do the six error changes of Lesson 8 again on the link shortener. Predict each code first.</li>
+<li>After one week: model a small part of your own software. Write at least two FRs, all four cells, and one <code>expect</code> block.</li>
+<li>After one month: add modules and scenarios to your own model and pass the architecture profile.</li>
+</ol>
+<p>When you write your own model, ask a colleague or an AI assistant to review your influences.
+Explain each <code>X</code> and each <code>0</code> in your own words, and let the reviewer ask why.
+Do not ask the assistant to write the model for you.
+You learn the method when you do the thinking.</p>
+
+</section><section id="sec-quick-reference" class="doc-section"><h2 id="quick-reference">Quick reference</h2>
+<h3 id="blocks-you-use-most">Blocks you use most</h3>
+<table>
+<thead>
+<tr>
+<th>Block</th>
+<th>Label</th>
+<th>Required fields</th>
+<th>Common optional fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>design</code></td>
+<td>yes</td>
+<td><code>boundary</code></td>
+<td><code>level</code>, <code>workload</code></td>
+</tr>
+<tr>
+<td><code>need</code></td>
+<td>yes</td>
+<td><code>statement</code></td>
+<td><code>why</code>, <code>stakeholder</code>, <code>origin</code></td>
+</tr>
+<tr>
+<td><code>fr</code></td>
+<td>yes</td>
+<td><code>statement</code>, and <code>need</code> on a top-level FR</td>
+<td><code>parent</code>, <code>alias</code>, <code>bounded_by</code>, <code>criterion</code> blocks</td>
+</tr>
+<tr>
+<td><code>criterion</code> (in <code>fr</code>)</td>
+<td>yes</td>
+<td><code>statement</code>, or <code>metric</code> + <code>op</code> + <code>value</code></td>
+<td><code>unit</code>, <code>under</code>, <code>origin</code>, <code>allocated_from</code></td>
+</tr>
+<tr>
+<td><code>dp</code></td>
+<td>yes</td>
+<td><code>controls</code>, <code>responsibility</code>, <code>decision</code></td>
+<td><code>why</code>, <code>alias</code>, <code>owns_state</code>, <code>reads_state</code>, <code>holds_if</code></td>
+</tr>
+<tr>
+<td><code>influence</code></td>
+<td>no</td>
+<td><code>from</code>, <code>to</code>, <code>effect</code></td>
+<td><code>mechanism</code>, <code>because</code>, <code>mechanism_source</code>, <code>under</code>, <code>holds_if</code>, <code>cites</code></td>
+</tr>
+<tr>
+<td><code>cells</code></td>
+<td>yes</td>
+<td><code>scope</code>, <code>unlisted</code></td>
+<td><code>because</code>, required for <code>none</code></td>
+</tr>
+<tr>
+<td><code>expect</code></td>
+<td>yes</td>
+<td><code>scope</code>, <code>classification</code></td>
+<td><code>order</code>, <code>basis</code>, <code>under</code></td>
+</tr>
+<tr>
+<td><code>coupling</code></td>
+<td>yes</td>
+<td><code>scope</code>, <code>affects</code>, <code>reason</code></td>
+<td><code>iteration_bound</code>, <code>convergence</code>, <code>stopping</code>, <code>failure_behavior</code></td>
+</tr>
+<tr>
+<td><code>assumption</code></td>
+<td>yes</td>
+<td><code>statement</code></td>
+<td><code>status</code></td>
+</tr>
+<tr>
+<td><code>module</code></td>
+<td>yes</td>
+<td><code>realizes</code> or <code>contains</code></td>
+<td><code>inputs</code>, <code>outputs</code>, <code>owns_state</code>, <code>dependencies</code>, <code>invariants</code>, <code>failure_behavior</code>, <code>acceptance_checks</code></td>
+</tr>
+<tr>
+<td><code>pv</code></td>
+<td>yes</td>
+<td><code>realizes</code></td>
+<td><code>kind</code>, <code>address</code>, <code>note</code></td>
+</tr>
+<tr>
+<td><code>scenario</code></td>
+<td>yes</td>
+<td><code>kind</code></td>
+<td><code>verifies</code>, <code>steps</code>, <code>vary</code>, <code>expect_affected</code>, <code>expect_unaffected</code>, <code>description</code></td>
+</tr>
+<tr>
+<td><code>decision</code></td>
+<td>yes</td>
+<td><code>addresses</code>, one or more <code>candidate</code> blocks</td>
+<td><code>selected</code>, <code>provisional</code>, <code>why</code></td>
+</tr>
+</tbody>
+</table>
+<p>The full list of blocks and fields is in the <a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/schema.md">field schema</a>.</p>
+<h3 id="codes-you-see-most">Codes you see most</h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid_structure</code></td>
+<td>A field is missing, unknown, or of the wrong type. Read the message.</td>
+</tr>
+<tr>
+<td><code>invalid_reference</code></td>
+<td>The reference names no block, or a block of the wrong type. Look for a typo.</td>
+</tr>
+<tr>
+<td><code>uncontrolled_requirement</code></td>
+<td>Add a selected DP that controls the FR.</td>
+</tr>
+<tr>
+<td><code>ineffective_control</code></td>
+<td>Add the material diagonal influence, or change the pairing.</td>
+</tr>
+<tr>
+<td><code>conflicting_influence</code></td>
+<td>Two influences disagree for one cell. Remove one, or separate them by context.</td>
+</tr>
+<tr>
+<td><code>unresolved_influence</code></td>
+<td>State the unknown cells with influences or a <code>cells</code> default.</td>
+</tr>
+<tr>
+<td><code>failed_expectation</code></td>
+<td>The result differs from your <code>expect</code> block. Find out which one is wrong.</td>
+</tr>
+<tr>
+<td><code>incomplete_feedback_contract</code></td>
+<td>Remove the coupling, or add a complete <code>coupling</code> block.</td>
+</tr>
+<tr>
+<td><code>support_gap</code></td>
+<td>A claim has no reviewed support. This warning stays until a review exists.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rules-to-remember">Rules to remember</h3>
+<ol>
+<li>Write each fact once. Never write a matrix, an ID number, or a classification by hand.</li>
+<li>An unlisted cell is unknown, not zero.</li>
+<li><code>material</code> needs <code>mechanism</code>. <code>none</code> needs <code>because</code>.</li>
+<li>Mark your own reasoning with <code>origin = "inferred"</code> or <code>mechanism_source = "inferred"</code>.</li>
+<li>Do not invent targets, mechanisms, or probabilities. Leave the gap, and let the tool report it.</li>
+<li>Exit code 0 means a valid model, not a proven design.</li>
+</ol>
+</section><section id="sec-where-to-go-next" class="doc-section"><h2 id="where-to-go-next">Where to go next</h2>
+<p>These documents are the full reference:</p>
+<ol>
+<li>The <a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/language.md">language reference</a> explains every block and rule.</li>
+<li>The <a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/schema.md">field schema</a> lists every field and type.</li>
+<li>The <a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/diagnostics.md">diagnostic contract</a> lists every code and its severity in each profile.</li>
+<li>The <a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/assessment-contract.md">assessment contract</a> explains how the tool derives its results.</li>
+<li>The <a href="https://github.com/axiomatic-design-hcl/spec/tree/main/examples/starter">starter example</a> shows a complete project with all three attachment roles.</li>
+<li>The <a href="https://github.com/axiomatic-design-hcl/adhcl#readme">adhcl README</a> explains the command line, the inputs, and the exit codes.</li>
+</ol></section>
+  </main>
+</div>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>RequirementsHCL and adhcl. Open source on <a href="https://github.com/axiomatic-design-hcl">GitHub</a>.</span>
+    <span><a href="index.html">Back to the overview</a></span>
+  </div>
+</footer>
+<script src="assets/site.js" defer></script>
+</body>
+</html>
