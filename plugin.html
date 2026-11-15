@@ -106,8 +106,8 @@
           <tr><td>Matrix cells</td><td>A cell is the effect of a change to the DP on the FR. It is not a call graph. An unknown cell stays <code>?</code>, and the classification stays unresolved.</td></tr>
           <tr><td>Whole system</td><td>Claude looks at shared state, resources, transactions, security policy, and failures across branches. A diagonal matrix in one branch does not prove independence of the whole system.</td></tr>
           <tr><td>Coupling</td><td>Claude first tries to remove coupling by a change of mechanism or ownership. A new service boundary or queue alone does not remove an effect.</td></tr>
-          <tr><td>Information Axiom</td><td>Information content is <code>I = -log2(p)</code>, where <code>p</code> is the chance that all FRs succeed together. Without evidence, Claude reports it as unknown and proposes a measurement. Zero failures in a small test do not prove <code>p = 1</code>.</td></tr>
-          <tr><td>Junctions</td><td>S combines independent outcomes. C enforces the order of a decoupled design. F makes a remaining feedback loop visible, with its bounds.</td></tr>
+          <tr><td>Information Axiom</td><td>Information content is <code>I = -log2(p)</code>, where <code>p</code> is the chance that all FRs succeed together. Suh adds the contents of separate FRs only when they succeed or fail independently. Without evidence, Claude reports it as unknown and proposes a measurement. Zero failures in a small test do not prove <code>p = 1</code>.</td></tr>
+          <tr><td>Junctions</td><td>S combines independent outcomes. C enforces the order of a decoupled design. F makes a remaining feedback loop visible, with its bounds. Kim, Suh, and Kim (1991) advise designers to avoid F junctions, because the iteration can fail to converge.</td></tr>
         </tbody>
       </table>
     </div>

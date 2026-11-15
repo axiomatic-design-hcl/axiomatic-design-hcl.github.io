@@ -110,7 +110,7 @@
     <div class="section-head">
       <span class="eyebrow">The design matrix</span>
       <h2 id="matrix-title">Three kinds of design</h2>
-      <p>The matrix has one row for each FR and one column for each DP. <code>X</code> is a material effect, <code>0</code> is no effect with a reason, and <code>?</code> is unknown. The Independence Axiom says: keep the FRs independent of each other.</p>
+      <p>The matrix has one row for each FR and one column for each DP. <code>X</code> is a material effect, <code>0</code> is no effect with a reason, and <code>?</code> is unknown. The Independence Axiom says: &ldquo;Maintain the independence of the functional requirements.&rdquo; In the papers, a cell is a number: the rate of change of the FR when the DP changes. RequirementsHCL uses symbols, because many effects in software are not numbers.</p>
     </div>
     <div class="grid grid-3">
       <div class="card matrix-card">
@@ -129,7 +129,7 @@
           <tr><th scope="row">FR1</th><td class="x">X</td><td class="z">0</td></tr>
           <tr><th scope="row">FR2</th><td class="x">X</td><td class="x">X</td></tr>
         </table>
-        <p class="muted">The effects form a triangle. Set DP1 first, then DP2. You never go back.</p>
+        <p class="muted">In a suitable order, the effects form a triangle. The FRs stay independent only if you set DP1 first, then DP2.</p>
       </div>
       <div class="card matrix-card">
         <span class="verdict">Coupled</span>
@@ -138,7 +138,7 @@
           <tr><th scope="row">FR1</th><td class="x">X</td><td class="x">X</td></tr>
           <tr><th scope="row">FR2</th><td class="x">X</td><td class="x">X</td></tr>
         </table>
-        <p class="muted">No order gives a triangle. A change to one DP forces changes to the other.</p>
+        <p class="muted">No order gives a diagonal or a triangle. A change to one DP forces changes to the other. This design does not satisfy the Independence Axiom.</p>
       </div>
     </div>
     <div class="note" style="margin-top: var(--s5)">
@@ -474,6 +474,9 @@ adhcl --help</code></pre></div>
           <tr><td><a href="https://github.com/axiomatic-design-hcl/spec/tree/main/examples/starter">Starter example</a></td><td>A complete project with a manifest and all three attachment kinds.</td></tr>
           <tr><td><a href="https://github.com/axiomatic-design-hcl/adhcl#readme">adhcl README</a></td><td>The command line, inputs, output, and exit codes.</td></tr>
           <tr><td><a href="https://github.com/axiomatic-design-hcl/axiomatic-design-plugin">Axiomatic Design plugin</a></td><td>The two Claude Code skills and their reference files.</td></tr>
+          <tr><td><a href="https://scispace.com/papers/design-of-software-systems-based-on-axiomatic-design-1cll9pq68v">Kim, Suh, and Kim (1991)</a></td><td>The first application of Axiomatic Design to software, with the S, C, and F junctions.</td></tr>
+          <tr><td><a href="https://scispace.com/papers/axiomatic-design-theory-for-systems-2ew81efl0d">Suh (1998)</a></td><td>Axiomatic design theory for systems: both axioms and the rule for adding information contents.</td></tr>
+          <tr><td><a href="https://scispace.com/papers/computing-the-information-content-of-decoupled-designs-2wsk61o40c">Frey, Jahangir, and Engelhardt (2000)</a></td><td>The proof that information contents of a decoupled design cannot be added.</td></tr>
         </tbody>
       </table>
     </div>

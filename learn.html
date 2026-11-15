@@ -170,10 +170,13 @@ Each mapping goes from "what" to "how":</p>
 <p>An FR states an outcome.
 A DP controls an outcome.
 A PV realizes a DP.</p>
+<p>Suh names the four domains the customer domain, the functional domain, the physical domain, and the process domain.
+The table uses the names of their contents.</p>
 <h3 id="the-design-matrix">The design matrix</h3>
 <p>The design matrix shows which DP affects which FR.
 It has one row for each FR and one column for each DP.
-Each cell has one of three values:</p>
+In the papers on Axiomatic Design, each cell is a number: the rate of change of the FR when the DP changes.
+Many effects in software are not numbers, so RequirementsHCL uses three symbols in place of numbers:</p>
 <table>
 <thead>
 <tr>
@@ -200,9 +203,9 @@ Each cell has one of three values:</p>
 An empty cell is never a silent zero.
 If you do not state a fact, the tool treats it as unknown.</p>
 <h3 id="three-kinds-of-design">Three kinds of design</h3>
-<p>The Independence Axiom says this: keep the FRs independent of each other.
-In a good design, you can adjust each FR with its own DP and not break the other FRs.
-The matrix tells you how well the design does this:</p>
+<p>The Independence Axiom says: "Maintain the independence of the functional requirements."
+When you change the DP of one FR, the other FRs must stay within their targets.
+The matrix tells you if the design does this:</p>
 <table>
 <thead>
 <tr>
@@ -219,16 +222,19 @@ The matrix tells you how well the design does this:</p>
 </tr>
 <tr>
 <td>Decoupled</td>
-<td>The <code>X</code> cells form a triangle.</td>
-<td>You can set the DPs in one fixed order and not go back.</td>
+<td>In a suitable order of rows and columns, the <code>X</code> cells form a triangle.</td>
+<td>The FRs stay independent only if you set the DPs in that order.</td>
 </tr>
 <tr>
 <td>Coupled</td>
-<td>No order makes a triangle.</td>
+<td>No order makes a diagonal or a triangle.</td>
 <td>A change to one DP forces changes to others, maybe again and again.</td>
 </tr>
 </tbody>
 </table>
+<p>Uncoupled and decoupled designs satisfy the Independence Axiom.
+Coupled designs do not.
+A design with fewer DPs than FRs is always coupled.</p>
 <p>Here are three small matrices, with FRs as rows and DPs as columns:</p>
 <div class="code"><pre><span></span><code>Uncoupled         Decoupled         Coupled
      DP1 DP2           DP1 DP2           DP1 DP2
@@ -1292,13 +1298,19 @@ Here is a decision with one candidate:</p>
 
 <p>The tool reports <code>unresolved_feasibility</code> as a warning.
 No evidence shows that this candidate meets the criteria.</p>
-<p>The Information Axiom picks the design with the highest chance of success.
-Information content is <code>I = -log2(p)</code>, where <code>p</code> is the chance that all FRs succeed together.
+<p>The Information Axiom says: "Minimize the information content of the design."
+It chooses among the designs that satisfy the Independence Axiom.
+Information content is <code>I = log2(1/p)</code>, which is the same as <code>-log2(p)</code>.
+Here <code>p</code> is the chance that an FR meets its target.
+A lower <code>I</code> means a higher chance of success.</p>
+<p>Suh adds the information contents of several FRs only when the FRs succeed or fail independently of each other.
+In 2000, Frey and his coauthors proved that this sum does not apply to decoupled designs.
+For this reason, RequirementsHCL uses one <code>p</code> for all FRs together.
 The language has strict rules for <code>p</code>:</p>
 <ol>
 <li>You cannot type a probability. It comes only from an <code>evidence</code> block with measured trials.</li>
 <li>The evidence names the candidate version, context, workload, time horizon, and a scenario that covers every criterion.</li>
-<li>Each trial measures all FRs together. You cannot multiply separate success rates.</li>
+<li>Each trial measures all FRs together. Do not multiply separate success rates only because the matrix is diagonal.</li>
 <li>Zero failures do not prove <code>p = 1</code>. The tool gives an interval, not a certainty.</li>
 <li>Without such evidence, the information content stays unknown and the decision stays provisional.</li>
 </ol>
@@ -1667,6 +1679,15 @@ You learn the method when you do the thinking.</p>
 <li>The <a href="https://github.com/axiomatic-design-hcl/spec/tree/main/examples/starter">starter example</a> shows a complete project with all three attachment roles.</li>
 <li>The <a href="https://github.com/axiomatic-design-hcl/adhcl#readme">adhcl README</a> explains the command line, the inputs, and the exit codes.</li>
 <li>The <a href="https://github.com/axiomatic-design-hcl/axiomatic-design-plugin">Axiomatic Design plugin</a> adds two skills to Claude Code. One skill applies the method to a system. The other skill writes the design as <code>.ad.hcl</code> files. The <a href="plugin.html">plugin page</a> describes both skills.</li>
+</ol>
+<h3 id="sources-on-axiomatic-design">Sources on Axiomatic Design</h3>
+<p>The method in this guide comes from these sources:</p>
+<ol>
+<li>Kim, Suh, and Kim (1991), <a href="https://scispace.com/papers/design-of-software-systems-based-on-axiomatic-design-1cll9pq68v">Design of software systems based on axiomatic design</a>. It applies the method to software and defines the S, C, and F junctions.</li>
+<li>Suh (1995), <a href="https://scispace.com/papers/designing-in-of-quality-through-axiomatic-design-1euher7e2j">Designing-in of quality through axiomatic design</a>. It gives the domains, the zigzag, the two axioms, and the matrix classes.</li>
+<li>Suh (1998), <a href="https://scispace.com/papers/axiomatic-design-theory-for-systems-2ew81efl0d">Axiomatic design theory for systems</a>. It states both axioms and the rule for adding information contents.</li>
+<li>Frey, Jahangir, and Engelhardt (2000), <a href="https://scispace.com/papers/computing-the-information-content-of-decoupled-designs-2wsk61o40c">Computing the information content of decoupled designs</a>. It proves that the sum of information contents does not apply to decoupled designs.</li>
+<li>Suh (2001), <a href="https://scispace.com/papers/axiomatic-design-advances-and-applications-41lnfhtghu">Axiomatic Design: Advances and Applications</a>. This book covers the full method, with software examples.</li>
 </ol></section>
   </main>
 </div>
