@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Axiomatic Design Plugin</title>
+<meta name="description" content="A Claude Code plugin with two skills: axiomatic-software-design applies the method to a system, and adhcl writes the design as .ad.hcl files.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brand-mark">AD</span> RequirementsHCL</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html#what">The language</a>
+      <a href="index.html#adhcl">The adhcl tool</a>
+      <a href="plugin.html" aria-current="page">Plugin</a>
+      <a href="learn.html">Learn</a>
+      <a href="https://github.com/axiomatic-design-hcl">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Claude Code plugin</span>
+    <h1>Design with the method. Write the result as .ad.hcl.</h1>
+    <p class="lead">The Axiomatic Design plugin gives Claude Code two skills. A skill is a set of instructions and reference files that Claude loads for one kind of task. One skill applies Axiomatic Design to a system. The other skill writes that design as <code>.ad.hcl</code> files.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="#install">Install the plugin</a>
+      <a class="btn" href="https://github.com/axiomatic-design-hcl/axiomatic-design-plugin">Open the repository</a>
+    </div>
+  </div>
+</section>
+
+<section class="band band-dark" id="workflow" aria-labelledby="workflow-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">How the parts fit</span>
+      <h2 id="workflow-title">One path from a question to a checked model</h2>
+      <p>Each part has one job. The method skill makes the design decisions. The language skill writes them down without changes. The tool tests the files.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card">
+        <span class="tag">Step 1 &middot; axiomatic-software-design</span>
+        <h3>Make the design</h3>
+        <p>You describe the system and the decision. Claude maps needs to FRs and DPs, builds the matrices, and reports coupling and unknowns.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Step 2 &middot; adhcl skill</span>
+        <h3>Write the files</h3>
+        <p>Claude turns that design into <code>.ad.hcl</code> files. It keeps every FR, DP, and effect, and it adds no new facts.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Step 3 &middot; adhcl tool</span>
+        <h3>Test the files</h3>
+        <p>The <code>adhcl validate</code> command reads the files and reports errors, gaps, and the classification of each matrix.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="method-skill" aria-labelledby="method-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Skill 1</span>
+      <h2 id="method-title">axiomatic-software-design</h2>
+      <p class="lead">This skill designs or reviews a software system with Axiomatic Design. It works at the level of architecture: responsibilities, boundaries, state ownership, and contracts. It stops before classes, libraries, and code.</p>
+    </div>
+
+    <div class="grid grid-2">
+      <div>
+        <h3>When to use it</h3>
+        <p>Use it when you ask for Axiomatic Design, or for an independence or information analysis of a system. It is not for routine code or for general architecture questions without this method.</p>
+        <p>Start it with this command in Claude Code:</p>
+        <div class="code"><pre><code>/axiomatic-design-skills:axiomatic-software-design</code></pre></div>
+        <p>Then describe the system, its requirements, and the decision. Claude can also select the skill from your request.</p>
+      </div>
+      <div>
+        <h3>What you get</h3>
+        <ol class="steps">
+          <li>The scope, the assumptions, and a trace from each need to its FRs and DPs, with stable IDs such as N1, FR1, and DP1.</li>
+          <li>A matrix for each important sibling set, with <code>X</code>, <code>0</code>, and <code>?</code>, and a reason for each effect.</li>
+          <li>The classification and the design order, or the cycle and its risk when the design is coupled.</li>
+          <li>Module contracts: inputs, outputs, owned state, invariants, and failure behavior.</li>
+          <li>A comparison of alternatives, with the limits of the evidence.</li>
+          <li>Scenarios that test the claims.</li>
+        </ol>
+      </div>
+    </div>
+
+    <h3 style="margin: var(--s6) 0 var(--s4)">The rules that the skill follows</h3>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">Topic</th><th scope="col">Rule</th></tr></thead>
+        <tbody>
+          <tr><td>FRs and constraints</td><td>An FR is an outcome with an acceptance criterion. A technology choice is not an FR. A hard requirement does not move into the constraints only to make the matrix diagonal.</td></tr>
+          <tr><td>Zigzag</td><td>Claude chooses DPs at one level, then derives the child FRs inside the chosen DP. It does not build the full FR tree first and add components later.</td></tr>
+          <tr><td>Matrix cells</td><td>A cell is the effect of a change to the DP on the FR. It is not a call graph. An unknown cell stays <code>?</code>, and the classification stays unresolved.</td></tr>
+          <tr><td>Whole system</td><td>Claude looks at shared state, resources, transactions, security policy, and failures across branches. A diagonal matrix in one branch does not prove independence of the whole system.</td></tr>
+          <tr><td>Coupling</td><td>Claude first tries to remove coupling by a change of mechanism or ownership. A new service boundary or queue alone does not remove an effect.</td></tr>
+          <tr><td>Information Axiom</td><td>Information content is <code>I = -log2(p)</code>, where <code>p</code> is the chance that all FRs succeed together. Without evidence, Claude reports it as unknown and proposes a measurement. Zero failures in a small test do not prove <code>p = 1</code>.</td></tr>
+          <tr><td>Junctions</td><td>S combines independent outcomes. C enforces the order of a decoupled design. F makes a remaining feedback loop visible, with its bounds.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <span class="tag">references/source-notes.md</span>
+        <h3>Source notes</h3>
+        <p>The skill adapts Kim, Suh, and Kim (1991), <em>Design of Software Systems Based on Axiomatic Design</em>. The notes summarize the paper, list the changes for software architecture, and name errors in the paper's examples.</p>
+      </div>
+      <div class="card">
+        <span class="tag">references/worked-example.md</span>
+        <h3>Worked example</h3>
+        <p>An invoice system with a ledger and a delivery worker. It shows a decoupled matrix, one zigzag step, a cross-branch effect, and a comparison of two candidates by joint probability.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="adhcl-skill" aria-labelledby="adhcl-skill-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Skill 2</span>
+      <h2 id="adhcl-skill-title">adhcl</h2>
+      <p class="lead">This skill turns a finished design into <code>requirements_hcl/core/1</code> files. It also writes manifests and attachments, and it runs the <code>adhcl</code> tool when the tool is available.</p>
+    </div>
+
+    <div class="grid grid-2">
+      <div>
+        <h3>When to use it</h3>
+        <p>Use it to write, update, repair, or review <code>.ad.hcl</code> files. Use it also to convert an FR and DP hierarchy or an influence table into HCL. For design decisions, it sends you back to <code>axiomatic-software-design</code>.</p>
+        <h3 style="margin-top: var(--s5)">What it does</h3>
+        <ol class="steps">
+          <li>It reads its bundled copies of the language reference, the field schema, the assessment contract, and the diagnostic contract.</li>
+          <li>It maps each part of the design to a block: the boundary to <code>design</code>, outcomes to <code>fr</code>, mechanisms to <code>dp</code>, and effects to <code>influence</code>.</li>
+          <li>It splits a large model by domain and branch, and keeps each branch together.</li>
+          <li>It puts tool bindings, behavior links, and views into attachments with a manifest.</li>
+          <li>It runs the tool, fixes syntax and reference mistakes, and reports the commands and results.</li>
+        </ol>
+      </div>
+      <div>
+        <h3>What it does not do</h3>
+        <ul class="rules">
+          <li>It does not redesign the system.</li>
+          <li>It does not add a mechanism, a threshold, a module, or a probability to satisfy a profile. It reports the gap.</li>
+          <li>It does not write matrices, numbers, classifications, or implementation status.</li>
+          <li>It does not add <code>expect</code> blocks to force a preferred result.</li>
+          <li>It does not change the design to remove a finding.</li>
+          <li>It does not claim validation when no tool ran.</li>
+        </ul>
+        <div class="note">
+          <p>The repository includes two test prompts for this skill in <code>plugins/adhcl/evals/evals.json</code>. Each prompt gives a design and lists what a correct conversion must contain.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-dark" id="install" aria-labelledby="install-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Install</span>
+      <h2 id="install-title">Add the marketplace, then install</h2>
+      <p>A marketplace is a catalog of plugins that Claude Code can install. Install <a href="https://code.claude.com/docs/en/setup">Claude Code</a> first, then run these commands in your shell.</p>
+    </div>
+    <div class="grid grid-2">
+      <div>
+        <ol class="steps">
+          <li>Register the marketplace from GitHub.</li>
+          <li>Install the plugin.</li>
+          <li>Restart Claude Code.</li>
+          <li>Run <code>claude plugin list</code> and make sure that the plugin is enabled.</li>
+        </ol>
+      </div>
+      <div class="code"><pre><code>claude plugin marketplace add \
+  axiomatic-design-hcl/axiomatic-design-plugin
+
+claude plugin install \
+  axiomatic-design-skills@axiomatic-design-marketplace</code></pre></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="status" aria-labelledby="plugin-status-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Status</span>
+      <h2 id="plugin-status-title">Version 0.1.0</h2>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">Part</th><th scope="col">Where it is</th><th scope="col">Installed by the commands above</th></tr></thead>
+        <tbody>
+          <tr><td><code>axiomatic-software-design</code></td><td><code>plugins/axiomatic-design-skills/skills/</code></td><td>Yes. The marketplace lists the <code>axiomatic-design-skills</code> plugin.</td></tr>
+          <tr><td><code>adhcl</code></td><td><code>plugins/adhcl/</code></td><td>No. The marketplace does not list this skill yet. You can use it from a local copy of the repository.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid grid-2">
+      <div>
+        <h3>Data</h3>
+        <p>The plugin holds instructions and reference files only. It has no connector, hook, or script that sends data to an outside service. Claude Code handles your prompts and files under its own terms.</p>
+      </div>
+      <div>
+        <h3>Limits</h3>
+        <p>The skills do not prove that a design is correct, and they do not replace tests. They name assumptions and unknowns so that you can test them.</p>
+      </div>
+    </div>
+    <p>The plugin uses the Apache License 2.0. To change it, read <a href="https://github.com/axiomatic-design-hcl/axiomatic-design-plugin/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> in the repository.</p>
+  </div>
+</section>
+
+<section class="band" id="next" aria-labelledby="next-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Next</span>
+      <h2 id="next-title">Learn the language that the skill writes</h2>
+      <p>The adhcl skill writes the same files that the course teaches. If you know the language, you can review the files that Claude writes.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="learn.html">Start the course</a>
+      <a class="btn" href="index.html#adhcl">Read about the adhcl tool</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>RequirementsHCL and adhcl. Open source on <a href="https://github.com/axiomatic-design-hcl">GitHub</a>.</span>
+    <span><a href="index.html">Back to the overview</a></span>
+  </div>
+</footer>
+<script src="assets/site.js" defer></script>
+</body>
+</html>

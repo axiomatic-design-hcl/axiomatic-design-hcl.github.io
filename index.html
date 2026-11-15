@@ -19,6 +19,7 @@
     <nav class="site-nav" aria-label="Main">
       <a href="#what">The language</a>
       <a href="#adhcl">The adhcl tool</a>
+      <a href="plugin.html">Plugin</a>
       <a href="learn.html">Learn</a>
       <a href="https://github.com/axiomatic-design-hcl">GitHub</a>
     </nav>
@@ -368,13 +369,39 @@ adhcl --help</code></pre></div>
   </div>
 </section>
 
+<section class="band" id="plugin" aria-labelledby="plugin-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Claude Code plugin</span>
+      <h2 id="plugin-title">Let Claude make the design and write the files</h2>
+      <p>The Axiomatic Design plugin adds two skills to Claude Code. A skill is a set of instructions and reference files that Claude loads for one kind of task.</p>
+    </div>
+    <div class="grid grid-2" style="margin-bottom: var(--s6)">
+      <div class="card">
+        <span class="tag">axiomatic-software-design</span>
+        <h3>Apply the method</h3>
+        <p>Claude maps needs to FRs and DPs, builds the matrices, finds coupling, and compares alternatives on evidence. The result is an architecture with module contracts.</p>
+      </div>
+      <div class="card">
+        <span class="tag">adhcl</span>
+        <h3>Write the .ad.hcl files</h3>
+        <p>Claude turns a finished design into <code>.ad.hcl</code> files without changes to its facts. Then it runs <code>adhcl</code> when the tool is available.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="plugin.html">Read about the plugin</a>
+      <a class="btn" href="plugin.html#install">Install it</a>
+    </div>
+  </div>
+</section>
+
 <section class="band band-dark" id="status" aria-labelledby="status-title">
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Status</span>
       <h2 id="status-title">What exists today</h2>
     </div>
-    <div class="grid grid-3">
+    <div class="grid grid-2">
       <div class="card">
         <span class="tag">spec</span>
         <h3>The specification</h3>
@@ -384,6 +411,11 @@ adhcl --help</code></pre></div>
         <span class="tag">adhcl</span>
         <h3>The validator</h3>
         <p>The <code>version</code> and <code>validate</code> commands. adhcl pins one revision of the specification and copies it into its test data.</p>
+      </div>
+      <div class="card">
+        <span class="tag">plugin</span>
+        <h3>The Claude Code plugin</h3>
+        <p>Version 0.1.0. The marketplace installs the <code>axiomatic-software-design</code> skill. The <code>adhcl</code> skill is in the repository but not yet in the marketplace.</p>
       </div>
       <div class="card">
         <span class="tag">not yet</span>
@@ -441,6 +473,7 @@ adhcl --help</code></pre></div>
           <tr><td><a href="https://github.com/axiomatic-design-hcl/spec/blob/main/docs/diagnostics.md">Diagnostic contract</a></td><td>Every finding code and its severity.</td></tr>
           <tr><td><a href="https://github.com/axiomatic-design-hcl/spec/tree/main/examples/starter">Starter example</a></td><td>A complete project with a manifest and all three attachment kinds.</td></tr>
           <tr><td><a href="https://github.com/axiomatic-design-hcl/adhcl#readme">adhcl README</a></td><td>The command line, inputs, output, and exit codes.</td></tr>
+          <tr><td><a href="https://github.com/axiomatic-design-hcl/axiomatic-design-plugin">Axiomatic Design plugin</a></td><td>The two Claude Code skills and their reference files.</td></tr>
         </tbody>
       </table>
     </div>

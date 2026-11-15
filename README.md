@@ -8,6 +8,7 @@ GitHub Pages serves it from the `main` branch.
 | File | Contents |
 |---|---|
 | `index.html` | The overview of the language and the tool. |
+| `plugin.html` | The Claude Code plugin and its two skills. |
 | `learn.html` | The course. A script makes it from `learn-ad-hcl.md`. |
 | `learn-ad-hcl.md` | The source text of the course. |
 | `assets/` | The stylesheet, the script, and the icon. |
