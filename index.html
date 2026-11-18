@@ -19,6 +19,7 @@
     <nav class="site-nav" aria-label="Main">
       <a href="#what">The language</a>
       <a href="#adhcl">The adhcl tool</a>
+      <a href="#diagram">Diagram</a>
       <a href="plugin.html">Plugin</a>
       <a href="learn.html">Learn</a>
       <a href="https://github.com/axiomatic-design-hcl">GitHub</a>
@@ -258,8 +259,8 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">The tool</span>
-      <h2 id="adhcl-title">adhcl reads the model and writes a report</h2>
-      <p class="lead">adhcl is a command line tool in Go. It parses the input, resolves the references, runs the core assessment, and prints a text report. It reads files only. It does not run your code or connect to a network.</p>
+      <h2 id="adhcl-title">adhcl reads the model and writes a report or a page</h2>
+      <p class="lead">adhcl is a command line tool in Go. It parses the input, resolves the references, and runs the core assessment. The <code>validate</code> command prints a text report. The <code>diagram</code> command writes one HTML page. adhcl does not run your code or connect to a network.</p>
     </div>
     <div class="grid grid-2">
       <div>
@@ -277,8 +278,11 @@
 adhcl validate [--profile source|architecture]
                [--candidate REF] [--context REF]
                [--] PATH
+adhcl diagram  [--profile source|architecture]
+               [--candidate REF] [--context REF]
+               [-o FILE|--output FILE] [--] PATH
 adhcl --help</code></pre></div>
-        <p class="muted"><code>PATH</code> is one <code>.ad.hcl</code> file, a folder, or a <code>.ad.project.hcl</code> manifest. Put the options before the path.</p>
+        <p class="muted"><code>PATH</code> is one <code>.ad.hcl</code> file, a folder, or a <code>.ad.project.hcl</code> manifest. Put the options before the path. The two commands accept the same options. Only <code>diagram</code> accepts <code>-o</code>.</p>
       </div>
     </div>
   </div>
@@ -309,14 +313,14 @@ adhcl --help</code></pre></div>
           <table class="data">
             <thead><tr><th scope="col">Code</th><th scope="col">Meaning</th></tr></thead>
             <tbody>
-              <tr><td><code class="sev-ok">0</code></td><td>Validation completed with no error findings.</td></tr>
-              <tr><td><code class="sev-error">1</code></td><td>An input, parse, assessment, attachment, or output step failed.</td></tr>
+              <tr><td><code class="sev-ok">0</code></td><td>For <code>validate</code>, the assessment found no errors. For <code>diagram</code>, the command delivered the page, also when the page shows errors.</td></tr>
+              <tr><td><code class="sev-error">1</code></td><td>An input, parse, assessment, attachment, or output step failed. For <code>diagram</code>, the assessment was blocked or the command could not write the page.</td></tr>
               <tr><td><code class="sev-warning">2</code></td><td>The command line is wrong.</td></tr>
             </tbody>
           </table>
         </div>
         <div class="note">
-          <p>Exit code 0 does not prove that the design is independent, that it is built, or that observations support it.</p>
+          <p>Exit code 0 does not prove that the design is independent, that it is built, or that observations support it. Use <code>validate</code>, not <code>diagram</code>, as the gate in CI.</p>
         </div>
       </div>
     </div>
@@ -349,6 +353,85 @@ adhcl --help</code></pre></div>
   </div>
 </section>
 
+<section class="band" id="diagram" aria-labelledby="diagram-title">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The diagram page</span>
+      <h2 id="diagram-title">One HTML page for each model</h2>
+      <p class="lead"><code>adhcl diagram</code> runs the same assessment as <code>validate</code>. Then it writes the model and the findings as one HTML file. You open the file in a browser. You do not need a server.</p>
+    </div>
+    <div class="grid grid-2" style="margin-bottom: var(--s6)">
+      <div>
+        <h3>Make the page</h3>
+        <ol class="steps">
+          <li>Build adhcl version 0.2.0 or later, as in <a href="#adhcl">Install</a>.</li>
+          <li>Run <code>adhcl diagram -o design.html PATH</code>. If the folder of <code>design.html</code> does not exist, make it first.</li>
+          <li>Open <code>design.html</code> in a browser.</li>
+        </ol>
+        <p>If you do not give <code>-o</code>, the command writes the page to stdout. You can also write <code>--output FILE</code> or <code>--output=FILE</code>.</p>
+      </div>
+      <div>
+        <h3>Output file</h3>
+        <div class="code"><pre><code>adhcl diagram -o design.html \
+  --profile architecture \
+  model.ad.project.hcl</code></pre></div>
+        <p>The command makes the complete page first and then replaces the file in one step. If the assessment is blocked, the command writes the report to stderr and does not change the file. An existing file keeps its permissions. A new file gets <code>0644</code>.</p>
+      </div>
+    </div>
+    <h3>One tab for each reader</h3>
+    <div class="table-wrap" style="margin-bottom: var(--s6)">
+      <table class="data">
+        <thead><tr><th scope="col">Tab</th><th scope="col">Reader</th><th scope="col">Question</th><th scope="col">Contents</th></tr></thead>
+        <tbody>
+          <tr><td>Start</td><td>Every reader</td><td>What is this design, and is it healthy?</td><td>The design and its boundary, the selected candidate and context, the input files, and the count of errors, warnings, and expectations.</td></tr>
+          <tr><td>Business view</td><td>Business lead</td><td>Whose problem does the product solve, and what limits the solution?</td><td>Scope, stakeholders, needs, constraints, and capabilities.</td></tr>
+          <tr><td>Product view</td><td>Product manager</td><td>What must the product do, and how do we accept it?</td><td>FRs with hierarchy numbers such as <code>1.2.1</code>, acceptance criteria, and scenarios.</td></tr>
+          <tr><td>Architecture view</td><td>Software architect</td><td>Which design choices control which outcomes, and where do they interfere?</td><td>DPs, each design matrix with its classification and design order, decisions, couplings, and expectations.</td></tr>
+          <tr><td>Engineering view</td><td>Software engineer</td><td>What do we build, and in which order does it run?</td><td>Process variables, module contracts, flows, and module junctions.</td></tr>
+          <tr><td>Trace and impact</td><td>Architect, tester</td><td>If one design choice changes, what else can change?</td><td>The trace map, the change impact of each DP, and a trace table from each need to its leaf FRs, DPs, modules, and scenarios.</td></tr>
+          <tr><td>Risks and evidence</td><td>Program manager</td><td>What is still open, and which proof is missing?</td><td>Open items, design risks, assumptions, evidence, and the findings grouped by code.</td></tr>
+          <tr><td>Guide</td><td>Every reader</td><td>What do FR, DP, X, and &ldquo;decoupled&rdquo; mean?</td><td>The terms, the matrix symbols, the labels, and a meaning and an action for each finding code.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid grid-2" style="margin-bottom: var(--s6)">
+      <div>
+        <h3>Labels</h3>
+        <p>Each claim on the page has a label. The label tells you where the claim comes from.</p>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th scope="col">Label</th><th scope="col">Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>Source</td><td>The model states it. The location gives the file and the line.</td></tr>
+              <tr><td>Inferred</td><td>The model states it, and the author marks it as an inference.</td></tr>
+              <tr><td>adhcl</td><td>The tool assessed it from the model.</td></tr>
+              <tr><td>Derived</td><td>The page follows links in the model to show it. An example is a need that a child FR gets from its parent FR.</td></tr>
+              <tr><td>Not in source</td><td>The model has no record for it. It is a gap, not a zero.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3>The HTML file</h3>
+        <ul class="rules">
+          <li>The file holds its own styles and script. It loads nothing from the network, so you can send it as one attachment.</li>
+          <li>The same model and the same options give the same bytes. You can commit the page and compare it in a review.</li>
+          <li>Each record has one home row. Every other mention of the record links to that row.</li>
+          <li>The tabs need JavaScript. Without JavaScript, the page shows all tabs in order.</li>
+          <li>When you print the page, each tab starts on a new sheet.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note" style="margin-bottom: var(--s6)">
+      <p>A page with zero errors is not proof that the design is valid. The page shows the same findings as <code>validate</code> and adds no new checks.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="examples/architecture-diagram.html">Open the example page</a>
+      <a class="btn" href="https://github.com/axiomatic-design-hcl/adhcl/blob/main/examples/architecture.ad.hcl">Read its model</a>
+    </div>
+  </div>
+</section>
+
 <section class="band" id="owners" aria-labelledby="owners-title">
   <div class="wrap">
     <div class="section-head">
@@ -362,7 +445,7 @@ adhcl --help</code></pre></div>
         <tbody>
           <tr><td><code>terraform_binding</code></td><td>binding</td><td><code>pv</code></td><td><code>address</code>, <code>observation_source</code></td><td><code>unknown</code>, with a warning. adhcl gets no observations.</td></tr>
           <tr><td><code>event_model_link</code></td><td>behavior link</td><td><code>module</code></td><td><code>model</code>, <code>revision</code>, <code>target_kind = "slice"</code>, <code>target_label</code></td><td><code>unknown</code>, with a warning. adhcl gets no behavior model.</td></tr>
-          <tr><td><code>html_view</code></td><td>view</td><td><code>design</code></td><td><code>layout</code>, <code>show_source_locations = true</code></td><td><code>valid</code> when the data is correct. adhcl does not render HTML.</td></tr>
+          <tr><td><code>html_view</code></td><td>view</td><td><code>design</code></td><td><code>layout</code>, <code>show_source_locations = true</code></td><td><code>valid</code> when the data is correct. The <code>diagram</code> command uses a fixed tab order and does not apply the layout.</td></tr>
         </tbody>
       </table>
     </div>
@@ -410,7 +493,7 @@ adhcl --help</code></pre></div>
       <div class="card">
         <span class="tag">adhcl</span>
         <h3>The validator</h3>
-        <p>The <code>version</code> and <code>validate</code> commands. adhcl pins one revision of the specification and copies it into its test data.</p>
+        <p>The <code>version</code>, <code>validate</code>, and <code>diagram</code> commands. adhcl pins one revision of the specification and copies it into its test data.</p>
       </div>
       <div class="card">
         <span class="tag">plugin</span>
@@ -420,7 +503,7 @@ adhcl --help</code></pre></div>
       <div class="card">
         <span class="tag">not yet</span>
         <h3>Open work</h3>
-        <p>Matrix, impact, and HTML reports, live observations for bindings, and external behavior models. Those owner results stay <code>unknown</code>.</p>
+        <p>Live observations for bindings and external behavior models. Those owner results stay <code>unknown</code>. The <code>diagram</code> command does not yet apply the layout of an <code>html_view</code> attachment.</p>
       </div>
     </div>
   </div>

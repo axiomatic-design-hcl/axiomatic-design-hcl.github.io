@@ -1200,6 +1200,26 @@ It cannot add a matrix cell or change a classification.
 The binding and behavior owners report `unknown` with a warning, because `adhcl` gets no observations and no behavior models.
 An `unknown` result never counts as success.
 
+### Draw the model as a page
+
+The `diagram` command runs the same assessment as `validate`.
+Then it writes the model and the findings as one HTML file:
+
+```sh
+adhcl diagram --profile architecture -o notes.html notes/model.ad.project.hcl
+```
+
+Open `notes.html` in a browser.
+The page has one tab for each reader: the business lead, the product manager, the architect, the engineer, and the program manager.
+The trace tab shows what a change to one DP can affect.
+The guide tab explains the terms and each finding code.
+
+The page uses a fixed tab order.
+It does not apply the `layout` of the `review_layout` attachment.
+The exit code is 0 when the command writes the page, also when the page shows errors.
+Use `validate` to decide if a model passes.
+The [example page](examples/architecture-diagram.html) shows the output for the architecture example of `adhcl`.
+
 ---
 
 ## Lesson 15: Decisions and evidence

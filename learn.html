@@ -1276,6 +1276,21 @@ A file or a folder input ignores them.</p>
 It cannot add a matrix cell or change a classification.
 The binding and behavior owners report <code>unknown</code> with a warning, because <code>adhcl</code> gets no observations and no behavior models.
 An <code>unknown</code> result never counts as success.</p>
+<h3 id="draw-the-model-as-a-page">Draw the model as a page</h3>
+<p>The <code>diagram</code> command runs the same assessment as <code>validate</code>.
+Then it writes the model and the findings as one HTML file:</p>
+<div class="code"><pre><span></span><code>adhcl<span class="w"> </span>diagram<span class="w"> </span>--profile<span class="w"> </span>architecture<span class="w"> </span>-o<span class="w"> </span>notes.html<span class="w"> </span>notes/model.ad.project.hcl
+</code></pre></div>
+
+<p>Open <code>notes.html</code> in a browser.
+The page has one tab for each reader: the business lead, the product manager, the architect, the engineer, and the program manager.
+The trace tab shows what a change to one DP can affect.
+The guide tab explains the terms and each finding code.</p>
+<p>The page uses a fixed tab order.
+It does not apply the <code>layout</code> of the <code>review_layout</code> attachment.
+The exit code is 0 when the command writes the page, also when the page shows errors.
+Use <code>validate</code> to decide if a model passes.
+The <a href="examples/architecture-diagram.html">example page</a> shows the output for the architecture example of <code>adhcl</code>.</p>
 
 <p class="done-row"><button type="button" class="btn-done" data-done="lesson-14-split-the-model-and-add-attachments" aria-pressed="false">Mark this lesson as done</button></p></section><section id="sec-lesson-15-decisions-and-evidence" class="doc-section" data-lesson="lesson-15-decisions-and-evidence"><h2 id="lesson-15-decisions-and-evidence">Lesson 15: Decisions and evidence</h2>
 <p>A <code>decision</code> block compares candidate designs for the same FRs.
